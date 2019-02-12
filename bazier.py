@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import random
-from point_model import Point
+from point_model import *
 
 # 获取控制点y坐标
 def controlPointY(pS, pD, controlPointX):
