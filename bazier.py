@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import random
-from point_model import *
+import point_model
 
 # 获取控制点y坐标
 def controlPointY(pS, pD, controlPointX):
@@ -44,7 +44,7 @@ def calControlPoint(pS, pD):
         # print("max", max)
         midy = random.uniform(min, max)
         midx = controlPointX(pS, pD, midy)
-    point = Point(midx, midy)
+    point = point_model.Point(midx, midy)
     return point
 
 # 起始点、终点，获得t时刻弧线上的点
@@ -61,7 +61,7 @@ def calCurvePointWithControl(t, start, control, dest):
     y = start.y * pow(1 - t, 2) \
         + control.y * t * (1 - t) * 2 \
         + dest.y * pow(t, 2)
-    return Point(x, y)
+    return point_model.Point(x, y)
 
 # 斜率
 def getGradient(pointS, pointD):

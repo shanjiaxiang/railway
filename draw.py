@@ -4,6 +4,7 @@ from bazier import *
 from turtle_util import *
 from point_model import *
 from common_utils import *
+# import DrawObstacleUtils as obstacle
 import threading
 import turtle
 
@@ -104,15 +105,32 @@ def fun_updateUserPosition_copy(user):
         print(model.inFlag)
 
 # 定时执行任务
-def fun_refresh():
+def fun_refresh(list_obstacle):
     global REFRESH_TIMER
     print("start refresh....")
+    # 绘制障碍物
+    fun_drawObstacles(list_obstacle)
+
     fun_updateUserPosition(ENTITIES_LIST)
     REFRESH_TIMER = threading.Timer(1, fun_refresh)
     REFRESH_TIMER.start()
 
+def fun_drawObstacles(list_obstacle):
+    for obstacle in list_obstacle:
+        drawObstacle(obstacle)
 
-
+def drawObstacle(obstacle):
+    print("obstacle:", obstacle.minX, obstacle.minY, obstacle.maxX, obstacle.maxY)
+    point1 = obstacle.leftBottom
+    point2 = obstacle.rightUp
+    upGoto(point1)
+    downGoto(Point(point2.x, point1.y))
+    downGoto(Point(point2.x, point2.y))
+    downGoto(Point(point1.x, point2.y))
+    downGoto(Point(point1.x, point1.y))
+    centerY = (point1.y + point2.y) / 2
+    upGoto(Point(point1.x + 4, centerY))
+    turtle.write("障碍物")
 
 # print("timeStampList:", timeStampList)
 
@@ -180,10 +198,10 @@ def startRefresh():
     REFRESH_TIMER = threading.Timer(1, fun_refresh)
     REFRESH_TIMER.start()
 
-initPen()
-print(turtle.delay())
-fun_genUsers()
-startRefresh()
-
-
-done()
+# initPen()
+# print(turtle.delay())
+# fun_genUsers()
+# startRefresh()
+#
+#
+# done()
