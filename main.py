@@ -9,6 +9,7 @@ import threading
 
 obstacles = []
 obastacleUtil = None
+drawUtil = None
 newMap = None
 newAstar = None
 pathList = None
@@ -61,6 +62,19 @@ def onClick(x, y):
     # 再次显示地图
     # newAstar.getMap2D().showArray2D()
     # print("end-------------------")
+
+def addObstacle(x, y):
+    global obstacles
+    global drawUtil
+    global obastacleUtil
+    # 是否生成障碍物
+    obstacle = obastacleUtil.getObstacle(x, y)
+    if obstacle is None:
+        return
+    else:
+        # obstacles.append(obstacle)
+        drawUtil.OBSTACLE_LIST = obstacles
+        print("after add size:", len(drawUtil.OBSTACLE_LIST))
 
 
 def calNextPosition(speed, time, paths):
@@ -134,12 +148,27 @@ def drawPosition():
     timer = threading.Timer(1, drawPosition)
     timer.start()
 
+def initDrawUtil(width, height, startPoint):
+    global drawUtil
+    dests = []
+    dests.append(DestinationModel(1, "闸机1", Point(50, 50)))
+    dests.append(DestinationModel(1, "闸机2", Point(50, 100)))
+    dests.append(DestinationModel(1, "闸机3", Point(50, 150)))
+    dests.append(DestinationModel(1, "闸机4", Point(150, 50)))
+    dests.append(DestinationModel(1, "闸机5", Point(150, 100)))
+    dests.append(DestinationModel(1, "闸机6", Point(150, 150)))
+
+    drawUtil = draw.DrawUtils(width, height, startPoint, dests)
+    drawUtil.fun_genUsers()
+    drawUtil.startRefresh()
+
 
 def main():
     global obstacles
     global obastacleUtil
     global newMap
     global newAstar
+    global drawUtil
 
     width = 200
     height = 200
@@ -148,14 +177,19 @@ def main():
 
     obstacles = []
     obastacleUtil = DrawObstacleUtils.DrawObstacleUtils((width, height), obstacles)
-    turtle.onscreenclick(onClick)
+    # turtle.onscreenclick(onClick)
+    turtle.onscreenclick(addObstacle)
+
 
     timer = threading.Timer(1, drawPosition)
     timer.start()
 
     # drawUtil = draw.DrawUtils(50, 50, )
+    # drawUtil.OBSTACLE_LIST =
     # draw.fun_genUsers()
     # draw.fun_refresh()
+    initDrawUtil(width, height, Point(50, 50))
+
 
     newMap = Array2D.Array2D(width, height)
     # newAstar = AStar.AStar(newMap, Point(2, 4), Point(49, 49))

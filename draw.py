@@ -67,8 +67,16 @@ class DrawUtils:
                 t = user.standardTime
                 currentPoint = calCurvePointWithControl(t, user.startPosition,
                                                         user.controlPositon, user.destPosition)
+                for obs in self.OBSTACLE_LIST:
+                    # 贝塞尔曲线规划的点在障碍物内
+                    if obstacle.minX < currentPoint.x < obstacle.maxX and \
+                            obstacle.minY < currentPoint.y < obstacle.maxY:
+                        # todo重新规划
+
+                        print("规划在障碍物内， 重新规划")
+
+
                 drawPoint(currentPoint)
-            else:
                 user.inFlag = False
 
     def fun_updateUserPosition_Perfect(self, list):
