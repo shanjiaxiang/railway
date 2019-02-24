@@ -8,12 +8,6 @@ from common_utils import *
 import threading
 import turtle
 
-
-# for i in range(100):
-#     drawArcByTimes(genRandPoint(), genRandPoint(),100)
-#     clear()
-# done()
-
 class DrawUtils:
     def __init__(self, width, height, startPoint, destList):
         self.width = width
@@ -64,6 +58,7 @@ class DrawUtils:
             drawArc(user.startPosition, user.destPosition)
 
     def fun_updateUserPosition(self, list):
+        # 清除当前显示的所有点
         clear()
         self.drawDestination(self.DEST_LIST)
         for user in list:
@@ -73,11 +68,22 @@ class DrawUtils:
                 currentPoint = calCurvePointWithControl(t, user.startPosition,
                                                         user.controlPositon, user.destPosition)
                 drawPoint(currentPoint)
-                # print(user.inFlag)
             else:
                 user.inFlag = False
-                # print("user:", list.index(user), ",已通过闸机")
-                # print(user.inFlag)
+
+    def fun_updateUserPosition_Perfect(self, list):
+        # 清除当前显示的所有点
+        clear()
+        self.drawDestination(self.DEST_LIST)
+        for user in list:
+            if (getCurrentTime() < user.destTime and user.inFlag is True):
+                user.setCurrentTime()
+                t = user.standardTime
+                currentPoint = calCurvePointWithControl(t, user.startPosition,
+                                                        user.controlPositon, user.destPosition)
+                drawPoint(currentPoint)
+            else:
+                user.inFlag = False
 
     def fun_updateUserPosition_copy(self, user):
         clear()
@@ -120,19 +126,15 @@ class DrawUtils:
             # model.startTime = getCurrentTime() + stamp
             self.ENTITIES_LIST.append(model)
 
-    def fun_timer1(self):
+    # 定时生成user
+    def fun_genUser(self):
         dest_num = random.randint(0, len(self.DEST_LIST) - 1)
-        # print("dest_num:", dest_num)
-        # print("dest_num:", self.DEST_LIST[dest_num].position.x, " ", self.DEST_LIST[dest_num].position.y)
         user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position)
         self.ENTITIES_LIST.append(user)
-        # print("ENTITIES size:", len(self.ENTITIES_LIST))
 
         if (self.COUNT < len(self.TTIME_DIFF_LIST)):
             countTime = round(self.TTIME_DIFF_LIST[self.COUNT] / 1000, 3)
-            # print("countTime:", countTime)
         self.COUNT = self.COUNT + 1
-        # print("self.COUNT:",self.COUNT)
 
         # 如果当前所有点已经添加,停止定时器，返回到主程序
         if (self.COUNT >= len(self.TIME_STAMP_LIST)):
@@ -140,19 +142,18 @@ class DrawUtils:
             print("TIMER1 has stoped....")
             return
         else:
-            self.GEN_USERS_TIMER = threading.Timer(countTime, self.fun_timer1)
+            self.GEN_USERS_TIMER = threading.Timer(countTime, self.fun_genUser)
             self.GEN_USERS_TIMER.start()
 
+    # 生成user入口函数
     def fun_genUsers(self):
         self.drawDestination(self.DEST_LIST)
-        # print("init data....")
+        # 产生随机时间戳，用于计算user生成事件间隔
         self.TIME_STAMP_LIST = getRandomListByTime(60000, 20)
-        # print("self.TIME_STAMP_LIST", TIME_STAMP_LIST)
+        # 计算user生成事件间隔
         self.TTIME_DIFF_LIST = self.getTimeStampDiff()
-        # print("self.TTIME_DIFF_LIST", self.TTIME_DIFF_LIST)
-        self.GEN_USERS_TIMER = threading.Timer(1, self.fun_timer1)
+        self.GEN_USERS_TIMER = threading.Timer(1, self.fun_genUser)
         self.GEN_USERS_TIMER.start()
-        # print("timer is start....")
 
     def startRefresh(self):
         self.REFRESH_TIMER = threading.Timer(1, self.fun_refresh)

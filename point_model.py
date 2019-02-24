@@ -42,6 +42,7 @@ class UserModel:
         self.startTime = getCurrentTime()
         self.currentTime = self.startTime
         self.destTime = self.startTime + self.totalTime
+        # 时间t， 用在贝塞尔曲线公式中，用于计算当前时间所在点的位置
         self.standardTime = self.getStandardTime()
 
     def setControlPoint(self):

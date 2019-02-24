@@ -92,7 +92,9 @@ def calNextPosition(speed, time, paths):
                 paths.remove(point)
             print("移除后路径size:", len(paths))
             return nextPoint
-    return paths[-1]
+    nextPoint = paths[-1]
+    paths.clear()
+    return nextPoint
 
 
 def calPathLength(path):
