@@ -7,22 +7,26 @@ import AStar as star
 
 MAP_SIZE = (200, 200)
 OBSTACLE_LIST = []
+TURTLE_OBSTACLE = turtle.RawTurtle(turtle.getscreen())
+TURTLE_OBSTACLE.hideturtle()
 
 
 def drawObstacle(obstacle):
     print("obstacle:", obstacle.minX, obstacle.minY, obstacle.maxX, obstacle.maxY)
     point1 = obstacle.leftBottom
     point2 = obstacle.rightUp
-    upGoto(point1)
-    downGoto(Point(point2.x, point1.y))
-    downGoto(Point(point2.x, point2.y))
-    downGoto(Point(point1.x, point2.y))
-    downGoto(Point(point1.x, point1.y))
+    TURTLE_OBSTACLE.penup()
+    TURTLE_OBSTACLE.goto(point1.x, point1.y)
+    TURTLE_OBSTACLE.pendown()
+    TURTLE_OBSTACLE.goto(point2.x, point1.y)
+    TURTLE_OBSTACLE.goto(point2.x, point2.y)
+    TURTLE_OBSTACLE.goto(point1.x, point2.y)
+    TURTLE_OBSTACLE.goto(point1.x, point1.y)
     centerY = (point1.y + point2.y) / 2
-    upGoto(Point(point1.x + 4, centerY))
-    turtle.write("障碍物")
-    OBSTACLE_LIST.append(obstacle)
-    # print("list size:", len(OBSTACLE_LIST))
+    TURTLE_OBSTACLE.penup()
+    TURTLE_OBSTACLE.goto(point1.x, centerY-2)
+    TURTLE_OBSTACLE.write("障碍物")
+    TURTLE_OBSTACLE.hideturtle()
 
 
 def isClickInObstacle(x, y):
@@ -36,16 +40,17 @@ def isClickInObstacle(x, y):
     print("you licked outside of obstacle")
     return False
 
+# 绘制所有的障碍物
 def fun_drawObstacles():
     for obstacle in OBSTACLE_LIST:
         drawObstacle(obstacle)
 
+
+# 获得点击位置
 def getClickPoint(x, y):
     if not isClickInObstacle(x, y):
-        newPoint = convertTurtleToMap(Point(x, y))
-        print("Tran x:", newPoint.x, "Tran y", newPoint.y)
-        upGoto(Point(x, y))
-        drawObstacle(SquareObstacle(Point(x, y), Point(x + 50, y + 50)))
+        OBSTACLE_LIST.append(SquareObstacle(Point(x, y), Point(x + 10, y + 10)))
+        drawObstacle(SquareObstacle(Point(x, y), Point(x + 10, y + 10)))
 
 
 def convertTurtleToMap(point):
@@ -56,13 +61,24 @@ def convertTurtleToMap(point):
 
 
 # draw.initPen()
-initCanvas(MAP_SIZE[0]/2, MAP_SIZE[1]/2)
+
+def getClickPoint1(x,y):
+    print("clicked x:",x, "y:",y)
+
+
+initCanvas(MAP_SIZE[0] / 2, MAP_SIZE[1] / 2)
 hideTurtle()
+turtle.setworldcoordinates(0,0,200,200)
+turtle.hideturtle()
+# TURTLE_OBSTACLE.setworldcoordinates(0,0,200, 200)
+# 设置坐标
+# turtle.setworldcoordinates(0,0, 200,200)
 turtleSpeed(0)
 turtle.delay(0)
 turtle.onscreenclick(getClickPoint)
+TURTLE_OBSTACLE.onclick(getClickPoint1)
 draw.fun_genUsers()
-draw.fun_refresh(OBSTACLE_LIST)
+draw.fun_refresh()
 turtle.mainloop()
 turtle.done()
 # done()
