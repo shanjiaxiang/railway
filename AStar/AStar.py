@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
-from Array2D import Array2D
-from Point import Point
+from Point import *
+import Array2D
+from obstacle import SquareObstacle
 
 
 class AStar:
@@ -34,6 +35,10 @@ class AStar:
         self.endPoint = endPoint
         # 可行走标记
         self.passTag = passTag
+        self.pathList = []
+
+    def setNewMap(self, map2D):
+        self.map2d = map2D
 
     def getMinNode(self):
         """
@@ -63,6 +68,23 @@ class AStar:
             if node.point == self.endPoint:
                 return node
         return None
+
+    def initObstacleArea(self, obstacles):
+        for x in range(self.map2d.w):
+            for y in range(self.map2d.h):
+                for obs in obstacles:
+                    if obs.minX < x < obs.maxX and \
+                                            obs.minY < y < obs.maxY:
+                        self.map2d[x][y] = 1
+
+    def addObastacleArea(self, obstacle):
+        for x in range(obstacle.leftBottom.x, obstacle.rightUp.x):
+            for y in range(obstacle.leftBottom.y, obstacle.rightUp.y):
+                if self.map2d[x][y] != 1:
+                    self.map2d[x][y] = 1
+
+    def getMap2D(self):
+        return self.map2d
 
     def searchNear(self, minF, offsetX, offsetY):
         """
@@ -137,48 +159,47 @@ class AStar:
                         # print(pathList)
                         # print(list(reversed(pathList)))
                         # print(pathList.reverse())
-                        return list(reversed(pathList))
+                        self.pathList = list(reversed(pathList))
+                        return self.pathList
             if len(self.openList) == 0:
                 return None
 
+    def getPathList(self):
+        return self.pathList
+
+    def setPathList(self):
+        self.pathList = []
+
+    def setOpenListEmpty(self):
+        self.openList = []
+
+    def setCloseListEmpty(self):
+        self.closeList = []
 
 if __name__ == '__main__':
-    # 创建一个10*10的地图
-    map2d = Array2D(30, 30)
+    map2d = Array2D.Array2D(50, 50)
+    newAstar = AStar(map2d, Point(2, 4), Point(49, 49))
     # 设置障碍
-    map2d[4][4] = 1
-    map2d[4][5] = 1
-    map2d[4][6] = 1
-    map2d[5][2] = 1
-    map2d[5][3] = 1
-    map2d[5][4] = 1
-    map2d[5][5] = 1
-    map2d[5][6] = 1
-    map2d[6][1] = 1
-    map2d[6][2] = 1
-    map2d[6][3] = 1
-    map2d[6][4] = 1
-    map2d[6][5] = 1
-    map2d[6][6] = 1
-    map2d[7][0] = 1
-    map2d[7][1] = 1
-    map2d[7][2] = 1
-    map2d[7][3] = 1
-    map2d[7][4] = 1
-    map2d[7][5] = 1
-    map2d[7][6] = 1
+    obstacleList = []
+    obstacleList.append(SquareObstacle.SquareObstacle(Point(15, 14), Point(25, 24)))
+    obstacleList.append(SquareObstacle.SquareObstacle(Point(32, 16), Point(42, 26)))
+    newAstar.initObstacleArea(obstacleList)
     # 显示地图当前样子
-    map2d.showArray2D()
+    newAstar.getMap2D().showArray2D()
+    # map2d.showArray2D()
     # 创建AStar对象,并设置起点为0,0终点为9,0
-    aStar = AStar(map2d, Point(2, 4), Point(29, 0))
+    # aStar = AStar(map2d, Point(2, 4), Point(29, 0))
     # 开始寻路
-    pathList = aStar.start()
+    pathList = newAstar.start()
     # 遍历路径点,在map2d上以'8'显示
     for point in pathList:
-        map2d[point.x][point.y] = '#'
+        newAstar.getMap2D()[point.x][point.y] = '#'
         # print(point)
     print("----------------------")
     # 再次显示地图
-    map2d.showArray2D()
+    newAstar.getMap2D().showArray2D()
 
 
+    # obstacleList = []
+    # newObstacle = SquareObstacle.SquareObstacle(Point(100, 100), Point(110, 110))
+    # obstacleList.append(newObstacle)
