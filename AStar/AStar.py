@@ -74,7 +74,7 @@ class AStar:
             for y in range(self.map2d.h):
                 for obs in obstacles:
                     if obs.minX < x < obs.maxX and \
-                                            obs.minY < y < obs.maxY:
+                            obs.minY < y < obs.maxY:
                         self.map2d[x][y] = 1
 
     def addObastacleArea(self, obstacle):
@@ -82,6 +82,13 @@ class AStar:
             for y in range(obstacle.leftBottom.y, obstacle.rightUp.y):
                 if self.map2d[x][y] != 1:
                     self.map2d[x][y] = 1
+
+    def addAllObastacleArea(self, obstacles):
+        for obstacle in obstacles:
+            for x in range(obstacle.leftBottom.x, obstacle.rightUp.x):
+                for y in range(obstacle.leftBottom.y, obstacle.rightUp.y):
+                    if self.map2d[x][y] != 1:
+                        self.map2d[x][y] = 1
 
     def getMap2D(self):
         return self.map2d
@@ -97,6 +104,8 @@ class AStar:
         # 越界检测
         if minF.point.x + offsetX < 0 or minF.point.x + offsetX > self.map2d.w - 1 or minF.point.y + offsetY < 0 or minF.point.y + offsetY > self.map2d.h - 1:
             return
+        print("minF.point.x + offsetX", minF.point.x + offsetX)
+        print("minF.point.y + offsetY", minF.point.y + offsetY)
         # 如果是障碍，就忽略
         if self.map2d[minF.point.x + offsetX][minF.point.y + offsetY] != self.passTag:
             return
@@ -176,6 +185,7 @@ class AStar:
     def setCloseListEmpty(self):
         self.closeList = []
 
+
 if __name__ == '__main__':
     map2d = Array2D.Array2D(50, 50)
     newAstar = AStar(map2d, Point(2, 4), Point(49, 49))
@@ -198,7 +208,6 @@ if __name__ == '__main__':
     print("----------------------")
     # 再次显示地图
     newAstar.getMap2D().showArray2D()
-
 
     # obstacleList = []
     # newObstacle = SquareObstacle.SquareObstacle(Point(100, 100), Point(110, 110))

@@ -181,8 +181,8 @@ def main():
     turtle.onscreenclick(addObstacle)
 
 
-    timer = threading.Timer(1, drawPosition)
-    timer.start()
+    # timer = threading.Timer(1, drawPosition)
+    # timer.start()
 
     # drawUtil = draw.DrawUtils(50, 50, )
     # drawUtil.OBSTACLE_LIST =

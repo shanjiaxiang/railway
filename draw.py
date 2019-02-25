@@ -7,6 +7,8 @@ from common_utils import *
 # import DrawObstacleUtils as obstacle
 import threading
 import turtle
+from AStar import Array2D, AStar
+
 
 class DrawUtils:
     def __init__(self, width, height, startPoint, destList):
@@ -58,25 +60,40 @@ class DrawUtils:
             drawArc(user.startPosition, user.destPosition)
 
     def fun_updateUserPosition(self, list):
+        inObastacle = False
         # 清除当前显示的所有点
         clear()
         self.drawDestination(self.DEST_LIST)
         for user in list:
+            # 点还没有超过结束时间
             if (getCurrentTime() < user.destTime and user.inFlag is True):
-                user.setCurrentTime()
-                t = user.standardTime
-                currentPoint = calCurvePointWithControl(t, user.startPosition,
-                                                        user.controlPositon, user.destPosition)
+                # 判断是否有AStar进行规划了路径
+                if user.pathList is None or len(user.pathList)==0:
+                    user.setCurrentTime()
+                    t = user.standardTime
+                    currentPoint = calCurvePointWithControl(t, user.startPosition,
+                                                            user.controlPositon, user.destPosition)
+                else:
+                    currentPoint = self.calNextPosition(user)
+
                 for obs in self.OBSTACLE_LIST:
-                    # 贝塞尔曲线规划的点在障碍物内
-                    if obstacle.minX < currentPoint.x < obstacle.maxX and \
-                            obstacle.minY < currentPoint.y < obstacle.maxY:
-                        # todo重新规划
+                    # 判断下一个目标点是否在障碍物内
+                    if obs.minX < currentPoint.x < obs.maxX and \
+                            obs.minY < currentPoint.y < obs.maxY:
+                        inObastacle = True
+                        break
+                if inObastacle:
+                    #  重新规划路径
+                    self.getAstarPath(user)
+                    currentPoint = self.calNextPosition(user)
 
-                        print("规划在障碍物内， 重新规划")
+                    print("规划在障碍物内， 重新规划")
 
-
+                if user.currPosition is not None:
+                    user.prePosition = user.currPosition
+                user.currPosition = currentPoint
                 drawPoint(currentPoint)
+            else:
                 user.inFlag = False
 
     def fun_updateUserPosition_Perfect(self, list):
@@ -175,6 +192,84 @@ class DrawUtils:
         turtleSpeed(0)
         turtle.delay(0)
         print(turtle.delay())
+
+    def getAstarPath(self, user):
+        newMap = Array2D.Array2D(self.width, self.height)
+        newAstar = AStar.AStar(newMap, Point(int(user.prePosition.x), int(user.prePosition.y)), user.destPosition)
+        # newAstar.setPathList()
+        # newAstar.setOpenListEmpty()
+        # newAstar.setCloseListEmpty()
+        newAstar.addAllObastacleArea(self.OBSTACLE_LIST)
+        user.pathList = newAstar.start()
+        user.startTime = getCurrentTime()
+        user.currentTime = getCurrentTime()
+
+    def drawPosition(self, startPoint, destPoint, pathList):
+        clear()
+        drawPoint(startPoint, 10)
+        drawPoint(destPoint, 10)
+        nextPoint = self.calNextPosition(5, 1, pathList)
+        if nextPoint is not None:
+            drawPoint(nextPoint, 10)
+        # 每秒计算一次
+        timer = threading.Timer(1, drawPosition)
+        timer.start()
+
+    def calNextPosition(self, user):
+        paths = user.pathList
+        speed = user.speed
+        # 时间差
+        user.currentTime = getCurrentTime()
+        time = round((user.currentTime - user.startTime)/1000, 3)
+        user.startTime = user.currentTime
+
+        if (paths is None) or (len(paths) < 1):
+            return None
+        distance = round(speed * time, 2)
+        length = 0
+        newPaths = []
+        size = len(paths) - 1
+        print("移除前size:", size)
+        for x in range(size):
+            absX = abs(paths[x].x - paths[x + 1].x)
+            absY = abs(paths[x].y - paths[x + 1].y)
+            if absX == 1 and absY == 1:
+                length += 1.4
+            elif absX == 1 and absY == 0:
+                length += 1
+            elif absX == 0 and absY == 1:
+                length += 1
+            else:
+                length += 1
+                print("路径中存在不相邻点")
+            newPaths.append(paths[x])
+            length = round(length, 2)
+            if length >= distance:
+                nextPoint = paths[x]
+                print("第几个点：", x)
+                for point in newPaths:
+                    paths.remove(point)
+                print("移除后路径size:", len(paths))
+                return nextPoint
+        nextPoint = paths[-1]
+        paths.clear()
+        return nextPoint
+
+    def calPathLength(self,path):
+        length = 0
+        for x in range(len(path) - 1):
+            absX = abs(path[x].x - path[x + 1].x)
+            absY = abs(path[x].y - path[x + 1].y)
+            if absX == 1 and absY == 1:
+                length += 1.4
+            elif absX == 1 and absY == 0:
+                length += 1
+            elif absX == 0 and absY == 1:
+                length += 1
+            else:
+                length += 1
+                print("路径中存在不相邻点")
+        return round(length, 2)
 
 
 # initPen(10,0)
