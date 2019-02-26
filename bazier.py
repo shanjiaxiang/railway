@@ -57,10 +57,11 @@ def calCurvePointWithControl(t, start, control, dest):
     x = start.x * pow(1 - t, 2) \
         + control.x * t * (1 - t) * 2 \
         + dest.x * pow(t, 2)
-
+    x = int(x)
     y = start.y * pow(1 - t, 2) \
         + control.y * t * (1 - t) * 2 \
         + dest.y * pow(t, 2)
+    y = int(y)
     return point_model.Point(x, y)
 
 # 斜率

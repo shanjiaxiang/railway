@@ -15,7 +15,7 @@ def genRandPoint():
 def calRandSpeed():
     vAverage = round(50 / 36, 2)
     vMin = round(25 / 36, 2)
-    vMax = round(75 / 36, 2)
+    vMax = round(50 / 36, 2)
     vRandom = random.uniform(vMin, vMax)
     return round(vRandom*5, 2)
 

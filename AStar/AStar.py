@@ -104,8 +104,6 @@ class AStar:
         # 越界检测
         if minF.point.x + offsetX < 0 or minF.point.x + offsetX > self.map2d.w - 1 or minF.point.y + offsetY < 0 or minF.point.y + offsetY > self.map2d.h - 1:
             return
-        print("minF.point.x + offsetX", minF.point.x + offsetX)
-        print("minF.point.y + offsetY", minF.point.y + offsetY)
         # 如果是障碍，就忽略
         if self.map2d[minF.point.x + offsetX][minF.point.y + offsetY] != self.passTag:
             return
@@ -135,6 +133,7 @@ class AStar:
         开始寻路
         :return: None或Point列表（路径）
         """
+        print("开始重新规划。。。")
         # 1.将起点放入开启列表
         startNode = AStar.Node(self.startPoint, self.endPoint)
         self.openList.append(startNode)

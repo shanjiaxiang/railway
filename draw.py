@@ -66,32 +66,41 @@ class DrawUtils:
         self.drawDestination(self.DEST_LIST)
         for user in list:
             # 点还没有超过结束时间
-            if (getCurrentTime() < user.destTime and user.inFlag is True):
+            if user.inFlag is True:
+            # if (getCurrentTime() < user.destTime and user.inFlag is True):
                 # 判断是否有AStar进行规划了路径
-                if user.pathList is None or len(user.pathList)==0:
+                if (user.pathList is None) or (len(user.pathList)==0):
                     user.setCurrentTime()
                     t = user.standardTime
-                    currentPoint = calCurvePointWithControl(t, user.startPosition,
-                                                            user.controlPositon, user.destPosition)
+                    print("t:", t)
+                    if t >= 1.0:
+                        currentPoint = user.destPosition
+                        user.inFlag = False
+                    else:
+                        currentPoint = calCurvePointWithControl(t, user.startPosition,
+                                                                user.controlPositon, user.destPosition)
                 else:
                     currentPoint = self.calNextPosition(user)
-
+                print("正常规划的点x:", currentPoint.x, ",y:", currentPoint.y)
                 for obs in self.OBSTACLE_LIST:
                     # 判断下一个目标点是否在障碍物内
-                    if obs.minX < currentPoint.x < obs.maxX and \
-                            obs.minY < currentPoint.y < obs.maxY:
+                    print("在障碍物列表中...")
+                    if ((obs.minX-1) < currentPoint.x < (obs.maxX +1))and \
+                            ((obs.minY-1) < currentPoint.y < (obs.maxY+1)):
                         inObastacle = True
                         break
                 if inObastacle:
                     #  重新规划路径
+                    print("规划的点在障碍物内， 重新规划")
                     self.getAstarPath(user)
                     currentPoint = self.calNextPosition(user)
+                    print("从新规划的点x:", currentPoint.x, ",y:", currentPoint.y)
 
-                    print("规划在障碍物内， 重新规划")
-
-                if user.currPosition is not None:
-                    user.prePosition = user.currPosition
+                user.prePosition = user.currPosition
+                print("user前一个点x:", user.prePosition.x, ",y:", user.prePosition.y)
                 user.currPosition = currentPoint
+                print("user现在的点:", user.currPosition.x, ",y:", user.currPosition.y)
+
                 drawPoint(currentPoint)
             else:
                 user.inFlag = False
@@ -175,6 +184,7 @@ class DrawUtils:
         self.drawDestination(self.DEST_LIST)
         # 产生随机时间戳，用于计算user生成事件间隔
         self.TIME_STAMP_LIST = getRandomListByTime(60000, 20)
+        # self.TIME_STAMP_LIST = getRandomListByTime(3000, 1)
         # 计算user生成事件间隔
         self.TTIME_DIFF_LIST = self.getTimeStampDiff()
         self.GEN_USERS_TIMER = threading.Timer(1, self.fun_genUser)
@@ -195,12 +205,15 @@ class DrawUtils:
 
     def getAstarPath(self, user):
         newMap = Array2D.Array2D(self.width, self.height)
-        newAstar = AStar.AStar(newMap, Point(int(user.prePosition.x), int(user.prePosition.y)), user.destPosition)
+        print("currPosition x:",user.currPosition.x, ",y:",user.currPosition.y)
+        newAstar = AStar.AStar(newMap, user.currPosition, user.destPosition)
         # newAstar.setPathList()
         # newAstar.setOpenListEmpty()
         # newAstar.setCloseListEmpty()
         newAstar.addAllObastacleArea(self.OBSTACLE_LIST)
         user.pathList = newAstar.start()
+        if user.pathList is not None and len(user.pathList)>0:
+            print("路径重新规划")
         user.startTime = getCurrentTime()
         user.currentTime = getCurrentTime()
 
@@ -253,6 +266,7 @@ class DrawUtils:
                 return nextPoint
         nextPoint = paths[-1]
         paths.clear()
+        user.inFlag = False
         return nextPoint
 
     def calPathLength(self,path):
