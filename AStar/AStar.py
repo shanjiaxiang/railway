@@ -136,14 +136,20 @@ class AStar:
         print("开始重新规划。。。")
         # 1.将起点放入开启列表
         startNode = AStar.Node(self.startPoint, self.endPoint)
+        print("start() startPoint x:", self.startPoint.x, ",y:", self.endPoint.y,
+              ",endpoint x:", self.endPoint.x, ",y:", self.endPoint.y)
         self.openList.append(startNode)
         # 2.主循环逻辑
         while True:
+            print("while main true....")
             # 找到F值最小的点
             minF = self.getMinNode()
+            print("is in obstacle:", self.isInObstacle(minF.point))
             # 把这个点加入closeList中，并且在openList中删除它
             self.closeList.append(minF)
             self.openList.remove(minF)
+            print("openlist len:", len(self.openList))
+            print("closeList len:", len(self.closeList))
             # 判断这个节点的上下左右节点
             self.searchNear(minF, 0, -1)
             self.searchNear(minF, 0, 1)
@@ -160,6 +166,7 @@ class AStar:
                 cPoint = point
                 pathList = []
                 while True:
+                    print("while true....")
                     if cPoint.father:
                         pathList.append(cPoint.point)
                         cPoint = cPoint.father
@@ -183,6 +190,13 @@ class AStar:
 
     def setCloseListEmpty(self):
         self.closeList = []
+
+    def isInObstacle(self, point):
+        if self.map2d[point.x][point.y] == 1:
+            return True
+        else:
+            return False
+
 
 
 if __name__ == '__main__':
