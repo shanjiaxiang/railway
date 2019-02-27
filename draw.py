@@ -45,20 +45,6 @@ class DrawUtils:
             penDown()
             turtle.write(model.name)
 
-    # 绘制路径
-    def drawPath(self):
-        for i in range(1, 100):
-            user = (genRandStartPointWithDest())
-            user_list.append(user)
-            drawArc(user.startPosition, user.destPosition)
-
-    # 绘制路径点
-    def drawPathPoint(self):
-        for i in range(1, 100):
-            user = (genRandStartPointWithDest())
-            user_list.append(user)
-            drawArc(user.startPosition, user.destPosition)
-
     def fun_updateUserPosition(self, list):
         # 清除当前显示的所有点
         clear()
@@ -69,7 +55,6 @@ class DrawUtils:
             if user.inFlag is True:
                 timeStamp = getCurrentTime()
                 user.setCurrentTime()
-                # if (getCurrentTime() < user.destTime and user.inFlag is True):
                 # 判断是否有AStar进行规划了路径
                 if (user.pathList is None) or (len(user.pathList) == 0):
                     t = user.standardTime
@@ -84,16 +69,14 @@ class DrawUtils:
                                                                 user.controlPositon, user.destPosition)
                 else:
                     # A星规划路径下一个点
-                    print("A* timeStamp:", getCurrentTime())
-                    currentPoint = self.calNextPosition(user)
+                    currentPoint = user.calNextPostition()
                 print("正常规划的点x:", currentPoint.x, ",y:", currentPoint.y)
 
                 if self.isInObstaclesArea(currentPoint) is True:
                     #  重新规划路径
                     print("规划的点在障碍物内， 重新规划")
-                    user.startTime = timeStamp
-                    self.getAstarPath(user)
-                    currentPoint = self.calNextPosition(user)
+                    self.getAstarPath(user, timeStamp)
+                    currentPoint = user.calNextPostition()
                     print("从新规划的点x:", currentPoint.x, ",y:", currentPoint.y)
 
                 user.prePosition = user.currPosition
@@ -128,23 +111,6 @@ class DrawUtils:
             else:
                 user.inFlag = False
 
-    def fun_updateUserPosition_copy(self, user):
-        clear()
-        # drawPoint(Point(0, 0))
-        # drawPoint(Point(30, 40))
-        # model.setCurrentTime()
-        # print(getCurrentTime())
-        # print(user.destTime)
-        if (getCurrentTime() < model.destTime and model.inFlag is True):
-            model.setCurrentTime()
-            t = model.standardTime
-            currentPoint = calCurvePointWithControl(t, model.startPosition, model.controlPositon, model.destPosition)
-            drawPoint(currentPoint)
-            # print(model.inFlag)
-        else:
-            model.inFlag = False
-            # print("已通过闸机")
-            # print(model.inFlag)
 
     # 定时执行任务
     def fun_refresh(self):
@@ -212,7 +178,7 @@ class DrawUtils:
         turtle.delay(0)
         print(turtle.delay())
 
-    def getAstarPath(self, user):
+    def getAstarPath(self, user, startTime):
         newMap = Array2D.Array2D(self.width, self.height)
         print("currPosition x:", user.currPosition.x, ",y:", user.currPosition.y)
         print("destPosition x:", user.destPosition.x, ",y:", user.destPosition.y)
@@ -225,18 +191,12 @@ class DrawUtils:
         else:
             print("位置已在障碍物区域内部，无法重新规划")
             user.inFlag = False
+        user.startTime = startTime
         user.currentTime = getCurrentTime()
+        user.distance = self.calPathLength(user.pathList)
+        user.totalTime = round(user.distance / user.speed, 3) * 1000
+        user.destTime = user.startTime + user.totalTime
 
-    def drawPosition(self, startPoint, destPoint, pathList):
-        clear()
-        drawPoint(startPoint, 10)
-        drawPoint(destPoint, 10)
-        nextPoint = self.calNextPosition(5, 1, pathList)
-        if nextPoint is not None:
-            drawPoint(nextPoint, 10)
-        # 每秒计算一次
-        timer = threading.Timer(1, drawPosition)
-        timer.start()
 
     def calNextPosition(self, user):
         paths = user.pathList

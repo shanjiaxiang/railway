@@ -2,6 +2,7 @@
 from common_utils import *
 import bazier
 
+
 class Point:
     x = 0
     y = 0
@@ -67,13 +68,37 @@ class UserModel:
     # 计算总时长
     def calTotalTime(self):
         distance = self.calDistance()
-        return round(distance / self.speed, 2) * 1000
+        return round(distance / self.speed, 3) * 1000
 
     # 归一化时间
     def getStandardTime(self):
         pastTime = self.currentTime - self.startTime
         return round(pastTime / self.totalTime, 3)
 
+    def calNextPostition(self):
+        currTime = getCurrentTime()
+        ratio = round((currTime - self.startTime) / self.totalTime, 3)
+        distance = int(self.distance * ratio)
+        size = len(self.pathList) - 1
+        print("移除前size:", size)
+        length = 0
+        for x in range(size):
+            absX = abs(self.pathList[x].x - self.pathList[x + 1].x)
+            absY = abs(self.pathList[x].y - self.pathList[x + 1].y)
+            if absX == 1 and absY == 1:
+                length += 1.4
+            elif absX == 1 and absY == 0:
+                length += 1
+            elif absX == 0 and absY == 1:
+                length += 1
+            else:
+                length += 1
+                print("路径中存在不相邻点")
+            length = round(length, 2)
+            if length >= distance:
+                return self.pathList[x]
+        self.inFlag = False
+        return self.pathList[-1]
 
 class DestinationModel:
     id = 0
