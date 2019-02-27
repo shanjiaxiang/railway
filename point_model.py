@@ -76,9 +76,13 @@ class UserModel:
         return round(pastTime / self.totalTime, 3)
 
     def calNextPostition(self):
+        print("user startTime:", self.startTime)
         currTime = getCurrentTime()
+        print("user currentTIme:", currTime)
         ratio = round((currTime - self.startTime) / self.totalTime, 3)
+        print("ratio:", ratio)
         distance = int(self.distance * ratio)
+        print("distance<:", distance)
         size = len(self.pathList) - 1
         print("移除前size:", size)
         length = 0

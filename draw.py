@@ -54,9 +54,9 @@ class DrawUtils:
             # 点还在规划区域内
             if user.inFlag is True:
                 timeStamp = getCurrentTime()
-                user.setCurrentTime()
                 # 判断是否有AStar进行规划了路径
                 if (user.pathList is None) or (len(user.pathList) == 0):
+                    user.setCurrentTime()
                     t = user.standardTime
                     print("t:", t)
                     # 贝塞尔取现路径超时，设置下一点目标为终点，已走出规划区
@@ -92,8 +92,8 @@ class DrawUtils:
         for obs in self.OBSTACLE_LIST:
             # 判断下一个目标点是否在障碍物内
             print("在障碍物列表中...")
-            if ((obs.minX - 1) < point.x < (obs.maxX + 1)) and \
-                    ((obs.minY - 1) < point.y < (obs.maxY + 1)):
+            if (obs.minX < point.x < obs.maxX) and \
+                    (obs.minY < point.y < obs.maxY):
                 return True
         return False
 
