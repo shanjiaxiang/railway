@@ -151,12 +151,12 @@ def drawPosition():
 def initDrawUtil(width, height, startPoint):
     global drawUtil
     dests = []
-    dests.append(DestinationModel(1, "闸机1", Point(50, 50)))
+    dests.append(DestinationModel(0, "闸机1", Point(50, 50)))
     dests.append(DestinationModel(1, "闸机2", Point(50, 100)))
-    dests.append(DestinationModel(1, "闸机3", Point(50, 150)))
-    dests.append(DestinationModel(1, "闸机4", Point(150, 50)))
-    dests.append(DestinationModel(1, "闸机5", Point(150, 100)))
-    dests.append(DestinationModel(1, "闸机6", Point(150, 150)))
+    dests.append(DestinationModel(2, "闸机3", Point(50, 150)))
+    dests.append(DestinationModel(3, "闸机4", Point(150, 50)))
+    dests.append(DestinationModel(4, "闸机5", Point(150, 100)))
+    dests.append(DestinationModel(5, "闸机6", Point(150, 150)))
 
     drawUtil = draw.DrawUtils(width, height, startPoint, dests)
     drawUtil.fun_genUsers()

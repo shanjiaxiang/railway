@@ -29,6 +29,9 @@ class UserModel:
     standardTime = 0
     pathList = []
 
+    waitTime = 0
+    destId = 0
+
     def __init__(self, start, dest, speed=0):
         self.startPosition = start
         self.destPosition = dest
@@ -47,6 +50,7 @@ class UserModel:
         # 时间t， 用在贝塞尔曲线公式中，用于计算当前时间所在点的位置
         self.standardTime = self.getStandardTime()
         self.pathList = []
+        self.destChanged = False
 
     def setControlPoint(self):
         controlPositon = bazier.calControlPoint(self.startPosition, self.destPosition)

@@ -8,6 +8,7 @@ from common_utils import *
 import threading
 import turtle
 from AStar import Array2D, AStar
+from LoadBalance import LoadBalanceUtils
 
 
 class DrawUtils:
@@ -25,6 +26,7 @@ class DrawUtils:
         self.COUNT = 0
         self.GEN_USERS_TIMER = threading.Timer
         self.REFRESH_TIMER = threading.Timer
+        self.hasObstacle = False
 
     def initPen(self):
         initCanvas(self.width, self.height)
@@ -50,12 +52,25 @@ class DrawUtils:
         clear()
         print("timeStamp:", getCurrentTime())
         self.drawDestination(self.DEST_LIST)
+        controlUtils = LoadBalanceUtils.LoadBalanceUtils(list, self.DEST_LIST, self.width, self.height,
+                                                                     self.OBSTACLE_LIST)
         for user in list:
             # 点还在规划区域内
             if user.inFlag is True:
                 timeStamp = getCurrentTime()
+                # 判断是否需要修改终点位置
+                if controlUtils.getNewDest(user, timeStamp):
+                    print("终点位置已修改")
+                else:
+                    print("终点位置未修改，路径不变")
+
                 # 判断是否有AStar进行规划了路径
-                if (user.pathList is None) or (len(user.pathList) == 0):
+                if ((user.pathList is None) or (len(user.pathList) == 0)):
+                    # 流量控制应只改变终点
+                    if user.destChanged is True:
+                        user.destChanged = False
+                        user = UserModel(user.currPosition, user.destPosition)
+
                     user.setCurrentTime()
                     t = user.standardTime
                     print("t:", t)
@@ -68,6 +83,9 @@ class DrawUtils:
                         currentPoint = calCurvePointWithControl(t, user.startPosition,
                                                                 user.controlPositon, user.destPosition)
                 else:
+                    if user.destChanged is True:
+                        user.destChanged = False
+                        self.getAstarPath(user, timeStamp)
                     # A星规划路径下一个点
                     currentPoint = user.calNextPostition()
                 print("正常规划的点x:", currentPoint.x, ",y:", currentPoint.y)
@@ -91,7 +109,7 @@ class DrawUtils:
     def isInObstaclesArea(self, point):
         for obs in self.OBSTACLE_LIST:
             # 判断下一个目标点是否在障碍物内
-            print("在障碍物列表中...")
+            # print("在障碍物列表中...")
             if (obs.minX < point.x < obs.maxX) and \
                     (obs.minY < point.y < obs.maxY):
                 return True
@@ -110,7 +128,6 @@ class DrawUtils:
                 drawPoint(currentPoint)
             else:
                 user.inFlag = False
-
 
     # 定时执行任务
     def fun_refresh(self):
@@ -139,6 +156,7 @@ class DrawUtils:
     def fun_genUser(self):
         dest_num = random.randint(0, len(self.DEST_LIST) - 1)
         user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position)
+        user.destId = dest_num
         self.ENTITIES_LIST.append(user)
 
         if (self.COUNT < len(self.TTIME_DIFF_LIST)):
@@ -158,7 +176,7 @@ class DrawUtils:
     def fun_genUsers(self):
         self.drawDestination(self.DEST_LIST)
         # 产生随机时间戳，用于计算user生成事件间隔
-        self.TIME_STAMP_LIST = getRandomListByTime(60000, 20)
+        self.TIME_STAMP_LIST = getRandomListByTime(60000, 50)
         # self.TIME_STAMP_LIST = getRandomListByTime(3000, 1)
         # 计算user生成事件间隔
         self.TTIME_DIFF_LIST = self.getTimeStampDiff()
@@ -197,6 +215,41 @@ class DrawUtils:
         user.totalTime = round(user.distance / user.speed, 3) * 1000
         user.destTime = user.startTime + user.totalTime
 
+    def getBestPath(self, user, startTime):
+        minDestTime = 0
+        minIndex = 0
+        pathListTemp = []
+        newMap = Array2D.Array2D(self.width, self.height)
+        # 遍历终点列表
+        destListSize = len(self.DEST_LIST)
+        for x in range(destListSize):
+            newAstar = AStar.AStar(newMap, user.currPosition, self.DEST_LIST[x])
+            newAstar.addAllObastacleArea(self.OBSTACLE_LIST)
+            pathList = newAstar.start()
+            if pathList is not None and len(pathList) > 0:
+                print("路径重新规划")
+            else:
+                print("位置已在障碍物区域内部，无法重新规划")
+                user.inFlag = False
+
+            pathListTemp.append(pathList)
+            distance = self.calPathLength(pathList)
+            totalTime = round(distance / user.speed, 3) * 1000
+            destTime = startTime + totalTime
+            if x == 0:
+                minDestTime = destTime
+                minIndex = 0
+            else:
+                if minDestTime > destTime:
+                    minIndex = x
+                    minDestTime = destTime
+
+        user.pathList = pathListTemp[minIndex]
+        user.startTime = startTime
+        user.currentTime = getCurrentTime()
+        user.distance = self.calPathLength(user.pathList)
+        user.totalTime = round(user.distance / user.speed, 3) * 1000
+        user.destTime = user.startTime + user.totalTime
 
     def calNextPosition(self, user):
         paths = user.pathList
@@ -262,12 +315,12 @@ class DrawUtils:
 # initPen(10,0)
 def fun_test():
     dests = []
-    dests.append(DestinationModel(1, "闸机1", Point(50, 50)))
+    dests.append(DestinationModel(0, "闸机1", Point(50, 50)))
     dests.append(DestinationModel(1, "闸机2", Point(50, 100)))
-    dests.append(DestinationModel(1, "闸机3", Point(50, 150)))
-    dests.append(DestinationModel(1, "闸机4", Point(150, 50)))
-    dests.append(DestinationModel(1, "闸机5", Point(150, 100)))
-    dests.append(DestinationModel(1, "闸机6", Point(150, 150)))
+    dests.append(DestinationModel(2, "闸机3", Point(50, 150)))
+    dests.append(DestinationModel(3, "闸机4", Point(150, 50)))
+    dests.append(DestinationModel(4, "闸机5", Point(150, 100)))
+    dests.append(DestinationModel(5, "闸机6", Point(150, 150)))
 
     utils = DrawUtils(200, 200, Point(50, 50), dests)
     utils.canvasInit()

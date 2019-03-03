@@ -141,15 +141,15 @@ class AStar:
         self.openList.append(startNode)
         # 2.主循环逻辑
         while True:
-            print("while main true....")
+            # print("while main true....")
             # 找到F值最小的点
             minF = self.getMinNode()
-            print("is in obstacle:", self.isInObstacle(minF.point))
+            # print("is in obstacle:", self.isInObstacle(minF.point))
             # 把这个点加入closeList中，并且在openList中删除它
             self.closeList.append(minF)
             self.openList.remove(minF)
-            print("openlist len:", len(self.openList))
-            print("closeList len:", len(self.closeList))
+            # print("openlist len:", len(self.openList))
+            # print("closeList len:", len(self.closeList))
             # 判断这个节点的上下左右节点
             self.searchNear(minF, 0, -1)
             self.searchNear(minF, 0, 1)
@@ -166,7 +166,7 @@ class AStar:
                 cPoint = point
                 pathList = []
                 while True:
-                    print("while true....")
+                    # print("while true....")
                     if cPoint.father:
                         pathList.append(cPoint.point)
                         cPoint = cPoint.father
