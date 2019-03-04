@@ -52,17 +52,17 @@ class DrawUtils:
         clear()
         print("timeStamp:", getCurrentTime())
         self.drawDestination(self.DEST_LIST)
-        controlUtils = LoadBalanceUtils.LoadBalanceUtils(list, self.DEST_LIST, self.width, self.height,
-                                                                     self.OBSTACLE_LIST)
+        # controlUtils = LoadBalanceUtils.LoadBalanceUtils(list, self.DEST_LIST, self.width, self.height,
+        #                                                              self.OBSTACLE_LIST)
         for user in list:
             # 点还在规划区域内
             if user.inFlag is True:
                 timeStamp = getCurrentTime()
                 # 判断是否需要修改终点位置
-                if controlUtils.getNewDest(user, timeStamp):
-                    print("终点位置已修改")
-                else:
-                    print("终点位置未修改，路径不变")
+                # if controlUtils.getNewDest(user, timeStamp):
+                #     print("终点位置已修改")
+                # else:
+                #     print("终点位置未修改，路径不变")
 
                 # 判断是否有AStar进行规划了路径
                 if ((user.pathList is None) or (len(user.pathList) == 0)):
@@ -154,7 +154,11 @@ class DrawUtils:
 
     # 定时生成user
     def fun_genUser(self):
-        dest_num = random.randint(0, len(self.DEST_LIST) - 1)
+        if len(self.OBSTACLE_LIST) == 0:
+            dest_num = random.randint(0, len(self.DEST_LIST) - 1)
+        else:
+            controlUtils = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height, self.OBSTACLE_LIST, Point(100, 100))
+            dest_num = controlUtils.newPath(getCurrentTime())
         user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position)
         user.destId = dest_num
         self.ENTITIES_LIST.append(user)
