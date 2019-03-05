@@ -156,9 +156,14 @@ class DrawUtils:
     def fun_genUser(self):
         if len(self.OBSTACLE_LIST) == 0:
             dest_num = random.randint(0, len(self.DEST_LIST) - 1)
+            print("障碍物列表为空， 未进行流量控制")
         else:
+            print("流量控制中.................")
             controlUtils = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height, self.OBSTACLE_LIST, Point(100, 100))
+            print("******开始时间", getCurrentTime())
             dest_num = controlUtils.newPath(getCurrentTime())
+            print("******结束时间", getCurrentTime())
+            print("load balance dest_num:", dest_num)
         user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position)
         user.destId = dest_num
         self.ENTITIES_LIST.append(user)
@@ -180,7 +185,7 @@ class DrawUtils:
     def fun_genUsers(self):
         self.drawDestination(self.DEST_LIST)
         # 产生随机时间戳，用于计算user生成事件间隔
-        self.TIME_STAMP_LIST = getRandomListByTime(60000, 50)
+        self.TIME_STAMP_LIST = getRandomListByTime(60000, 200)
         # self.TIME_STAMP_LIST = getRandomListByTime(3000, 1)
         # 计算user生成事件间隔
         self.TTIME_DIFF_LIST = self.getTimeStampDiff()

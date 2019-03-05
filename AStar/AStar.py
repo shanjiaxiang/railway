@@ -135,9 +135,11 @@ class AStar:
         """
         print("开始重新规划。。。")
         # 1.将起点放入开启列表
-        startNode = AStar.Node(self.startPoint, self.endPoint)
-        print("start() startPoint x:", self.startPoint.x, ",y:", self.endPoint.y,
-              ",endpoint x:", self.endPoint.x, ",y:", self.endPoint.y)
+        startPoint = Point(int(self.startPoint.x), int(self.startPoint.y))
+        endPoint = Point(int(self.endPoint.x), int(self.endPoint.y))
+        startNode = AStar.Node(startPoint, endPoint)
+        print("start() startPoint x:", startPoint.x, ",y:",endPoint.y,
+              ",endpoint x:", endPoint.x, ",y:", endPoint.y)
         self.openList.append(startNode)
         # 2.主循环逻辑
         while True:
