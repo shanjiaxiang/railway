@@ -12,14 +12,12 @@ class QueueModel:
     def __init__(self, destId, userList):
         self.destId = destId
         self.userList = userList
-        print("in userlist size:", len(userList))
 
     def calculate(self):
         if len(self.userList) > 0:
             minTime = self.userList[0].destTime
             maxTime = self.userList[0].destTime
             for user in self.userList:
-                print("user dest time:", user.destTime)
                 if user.destTime < minTime:
                     minTime = user.destTime
                 if user.destTime > maxTime:
@@ -31,9 +29,3 @@ class QueueModel:
             if time > self.endTime:
                 self.endTime = time
             self.pointDensity = int((self.endTime - self.startTime)/len(self.userList))
-            print("当前队列信息如下：")
-            print("Dest id:", self.destId)
-            print("User list size:", len(self.userList))
-            print("queue start time:", self.startTime)
-            print("queue end time:", self.endTime)
-            print("queue density:", self.pointDensity)

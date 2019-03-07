@@ -9,6 +9,7 @@ import threading
 import turtle
 from AStar import Array2D, AStar
 from LoadBalance import LoadBalanceUtils
+from utils import FileUtils
 
 
 class DrawUtils:
@@ -27,6 +28,8 @@ class DrawUtils:
         self.GEN_USERS_TIMER = threading.Timer
         self.REFRESH_TIMER = threading.Timer
         self.hasObstacle = False
+        self.queueList = []
+        self.controlUtil = 0
 
     def initPen(self):
         initCanvas(self.width, self.height)
@@ -50,7 +53,6 @@ class DrawUtils:
     def fun_updateUserPosition(self, list):
         # 清除当前显示的所有点
         clear()
-        print("timeStamp:", getCurrentTime())
         self.drawDestination(self.DEST_LIST)
         # controlUtils = LoadBalanceUtils.LoadBalanceUtils(list, self.DEST_LIST, self.width, self.height,
         #                                                              self.OBSTACLE_LIST)
@@ -73,7 +75,6 @@ class DrawUtils:
 
                     user.setCurrentTime()
                     t = user.standardTime
-                    print("t:", t)
                     # 贝塞尔取现路径超时，设置下一点目标为终点，已走出规划区
                     if t >= 1.0:
                         currentPoint = user.destPosition
@@ -88,19 +89,15 @@ class DrawUtils:
                         self.getAstarPath(user, timeStamp)
                     # A星规划路径下一个点
                     currentPoint = user.calNextPostition()
-                print("正常规划的点x:", currentPoint.x, ",y:", currentPoint.y)
 
                 if self.isInObstaclesArea(currentPoint) is True:
                     #  重新规划路径
                     print("规划的点在障碍物内， 重新规划")
                     self.getAstarPath(user, timeStamp)
                     currentPoint = user.calNextPostition()
-                    print("从新规划的点x:", currentPoint.x, ",y:", currentPoint.y)
 
                 user.prePosition = user.currPosition
-                print("user前一个点x:", user.prePosition.x, ",y:", user.prePosition.y)
                 user.currPosition = currentPoint
-                print("user现在的点:", user.currPosition.x, ",y:", user.currPosition.y)
 
                 drawPoint(currentPoint)
             else:
@@ -129,10 +126,38 @@ class DrawUtils:
             else:
                 user.inFlag = False
 
+    # 10秒钟内各队列中有多少个已出闸机的
+    def fun_calQueueNum(self):
+        endTime = getCurrentTime()
+        startTime = endTime - 10000
+        outList = []
+        for queue in self.queueList:
+            count = 0
+            outList.append(0)
+            for user in queue.userList:
+                if user.inFlag is not True:
+                    if (startTime < user.destTime) and (user.destTime < endTime):
+                        count = count + 1
+            outList[queue.destId] = count
+            print("queue out size:", outList[queue.destId])
+        return outList
+
+    def fun_displayLoadInfo(self):
+        outList = self.fun_calQueueNum()
+        for x in range(len(outList)):
+            turtle.penup()
+            turtle.goto(20, 180-10*x)
+            # upGoto(Point(20, 180 - 20 * x))
+            turtle.write(str(outList[x]))
+
     # 定时执行任务
     def fun_refresh(self):
-
         self.fun_updateUserPosition(self.ENTITIES_LIST)
+        self.controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height,
+                                                         self.OBSTACLE_LIST, Point(100, 100))
+        self.queueList = self.controlUtil.outUserList
+
+        self.fun_displayLoadInfo()
         self.REFRESH_TIMER = threading.Timer(1, self.fun_refresh)
         self.REFRESH_TIMER.start()
 
@@ -154,14 +179,16 @@ class DrawUtils:
 
     # 定时生成user
     def fun_genUser(self):
+
+
         if len(self.OBSTACLE_LIST) == 0:
             dest_num = random.randint(0, len(self.DEST_LIST) - 1)
             print("障碍物列表为空， 未进行流量控制")
         else:
             print("流量控制中.................")
-            controlUtils = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height, self.OBSTACLE_LIST, Point(100, 100))
+            # controlUtils = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height, self.OBSTACLE_LIST, Point(100, 100))
             print("******开始时间", getCurrentTime())
-            dest_num = controlUtils.newPath(getCurrentTime())
+            dest_num = self.controlUtil.newPath(getCurrentTime())
             print("******结束时间", getCurrentTime())
             print("load balance dest_num:", dest_num)
         user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position)
@@ -185,7 +212,11 @@ class DrawUtils:
     def fun_genUsers(self):
         self.drawDestination(self.DEST_LIST)
         # 产生随机时间戳，用于计算user生成事件间隔
-        self.TIME_STAMP_LIST = getRandomListByTime(60000, 200)
+
+        # self.TIME_STAMP_LIST = getRandomListByTime(60000, 200)
+        # f = open('data/data.txt','r')
+        self.TIME_STAMP_LIST = FileUtils.FileUtils.readFile()
+        print(len(self.TIME_STAMP_LIST))
         # self.TIME_STAMP_LIST = getRandomListByTime(3000, 1)
         # 计算user生成事件间隔
         self.TTIME_DIFF_LIST = self.getTimeStampDiff()

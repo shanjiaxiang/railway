@@ -23,8 +23,6 @@ class LoadBalanceUtils:
     def __init__(self, userList, destList, width, height, obstacleList, startPoint):
         self.userList = userList
         self.destList = destList
-        print("raw userList size:", len(userList))
-        print("raw destList size:", len(destList))
         self.getQueueList()
         self.width = width
         self.height = height
@@ -38,12 +36,9 @@ class LoadBalanceUtils:
         self.queueList.clear()
         self.outUserList.clear()
         for dest in self.destList:
-            print("dest id", dest.id)
             self.queueList.append(QueueModel(dest.id, []))
             self.outUserList.append(QueueModel(dest.id, []))
 
-        print("after create queue:", len(self.queueList))
-        print("after create out List:", len(self.outUserList))
         for user in self.userList:
             if user.inFlag:
                 for queue in self.queueList:
@@ -57,10 +52,10 @@ class LoadBalanceUtils:
                         break
         # print()
         for queue in self.outUserList:
-            print("*****************************id:", queue.destId, ",", "size:", len(queue.userList))
+            print("*****************************out user queue:", queue.destId, ",", "size:", len(queue.userList))
 
         for queue in self.queueList:
-            print("queue list size:", len(queue.userList))
+            print("*****************************int user queue:", len(queue.userList))
             queue.calculate()
 
     def getDistance(self, startPosition, destPosition):
@@ -73,7 +68,6 @@ class LoadBalanceUtils:
         timeList = []
         index = 0
         for queue in self.queueList:
-            print("queue endtime:", queue.endTime)
             timeList.append(queue.endTime)
 
         newMap = Array2D.Array2D(self.width, self.height)
@@ -83,11 +77,9 @@ class LoadBalanceUtils:
             totalTime = round(distance / common_utils.calRandSpeed(), 3) * 1000
             # 重新规划到达闸机时间
             destTime = startTime + totalTime
-            print("calculate destTime:", x, ":", destTime)
             # 将各闸机口给出的时间 存储到临时列表中，方便计算最早到闸机口时间
             if destTime > timeList[x]:
                 timeList[x] = destTime
-            print("updated destTime:", timeList[x])
 
         minTime = 0
         for x in range(len(timeList)):
@@ -102,7 +94,6 @@ class LoadBalanceUtils:
     def newPath2(self, startTime):
         timeList = []
         for queue in self.queueList:
-            print("queue endtime:", queue.endTime)
             timeList.append(queue.endTime)
 
         newMap = Array2D.Array2D(self.width, self.height)
