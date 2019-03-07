@@ -29,7 +29,11 @@ class DrawUtils:
         self.REFRESH_TIMER = threading.Timer
         self.hasObstacle = False
         self.queueList = []
-        self.controlUtil = 0
+        self.controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width,
+                                                             self.height,
+                                                             self.OBSTACLE_LIST, Point(100, 100))
+        self.startTime = 0
+        self.endTime = 0
 
     def initPen(self):
         initCanvas(self.width, self.height)
@@ -144,17 +148,55 @@ class DrawUtils:
 
     def fun_displayLoadInfo(self):
         outList = self.fun_calQueueNum()
+        turtle.penup()
+        turtle.goto(20, 190)
+        turtle.write("10s")
+        turtle.penup()
+        turtle.goto(30, 190)
+        turtle.write("total")
         for x in range(len(outList)):
             turtle.penup()
-            turtle.goto(20, 180-10*x)
+            turtle.goto(20, 180 - 10 * x)
             # upGoto(Point(20, 180 - 20 * x))
             turtle.write(str(outList[x]))
 
+        for x in range(len(self.queueList)):
+            turtle.penup()
+            turtle.goto(30, 180 - 10 * x)
+            # upGoto(Point(20, 180 - 20 * x))
+            turtle.write(len(self.queueList[x].userList))
+
+    def fun_isFinished(self):
+        flag = True
+        for user in self.ENTITIES_LIST:
+            if user.inFlag:
+                flag = False
+                break
+        return flag
+
     # 定时执行任务
     def fun_refresh(self):
+
         self.fun_updateUserPosition(self.ENTITIES_LIST)
-        self.controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height,
-                                                         self.OBSTACLE_LIST, Point(100, 100))
+
+        if self.fun_isFinished() is True:
+            self.REFRESH_TIMER.cancel()
+            print("refresh time is cancel..........................")
+        else:
+            self.endTime = getCurrentTime()
+            diffTime = round((self.endTime - self.startTime) / 1000, 3)
+            turtle.penup()
+            turtle.goto(0, 0)
+            turtle.write("共计用时:" + str(diffTime))
+        self.controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width,
+                                                             self.height,
+                                                             self.OBSTACLE_LIST, Point(100, 100))
+
+        # controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height,
+        #                                                  self.OBSTACLE_LIST, Point(100, 100))
+        print("_____________________controlUtil")
+        print(len(self.controlUtil.outUserList))
+        # print(len(controlUtil.outUserList))
         self.queueList = self.controlUtil.outUserList
 
         self.fun_displayLoadInfo()
@@ -179,7 +221,6 @@ class DrawUtils:
 
     # 定时生成user
     def fun_genUser(self):
-
 
         if len(self.OBSTACLE_LIST) == 0:
             dest_num = random.randint(0, len(self.DEST_LIST) - 1)
@@ -210,6 +251,7 @@ class DrawUtils:
 
     # 生成user入口函数
     def fun_genUsers(self):
+        self.startTime = getCurrentTime()
         self.drawDestination(self.DEST_LIST)
         # 产生随机时间戳，用于计算user生成事件间隔
 

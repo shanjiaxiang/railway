@@ -23,13 +23,14 @@ class LoadBalanceUtils:
     def __init__(self, userList, destList, width, height, obstacleList, startPoint):
         self.userList = userList
         self.destList = destList
-        self.getQueueList()
         self.width = width
         self.height = height
         self.diffList = []
         self.obstacleList = obstacleList
         self.startPoint = startPoint
         self.outUserList = []
+        self.queueList = []
+        self.getQueueList()
 
     def getQueueList(self):
         # 根据终点列表，创建队列列表
