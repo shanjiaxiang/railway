@@ -7,6 +7,7 @@ import draw
 from AStar import Array2D, AStar
 import threading
 
+
 obstacles = []
 obastacleUtil = None
 drawUtil = None

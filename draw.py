@@ -10,6 +10,8 @@ import turtle
 from AStar import Array2D, AStar
 from LoadBalance import LoadBalanceUtils
 from utils import FileUtils
+from plt import DrawLineUtils
+import _thread
 
 
 class DrawUtils:
@@ -34,6 +36,8 @@ class DrawUtils:
                                                              self.OBSTACLE_LIST, Point(100, 100))
         self.startTime = 0
         self.endTime = 0
+        self.destIndex = 0
+        self.drawLineUtil = DrawLineUtils.DrawLineUtils(6)
 
     def initPen(self):
         initCanvas(self.width, self.height)
@@ -160,11 +164,16 @@ class DrawUtils:
             # upGoto(Point(20, 180 - 20 * x))
             turtle.write(str(outList[x]))
 
+        # _thread.start_new_thread(self.drawLines, (outList,))
+        self.drawLineUtil.drawLines(outList)
         for x in range(len(self.queueList)):
             turtle.penup()
             turtle.goto(30, 180 - 10 * x)
             # upGoto(Point(20, 180 - 20 * x))
             turtle.write(len(self.queueList[x].userList))
+
+    def drawLines(self, outList):
+        self.drawLineUtil.drawLines(outList)
 
     def fun_isFinished(self):
         flag = True
@@ -179,15 +188,12 @@ class DrawUtils:
 
         self.fun_updateUserPosition(self.ENTITIES_LIST)
 
-        if self.fun_isFinished() is True:
-            self.REFRESH_TIMER.cancel()
-            print("refresh time is cancel..........................")
-        else:
-            self.endTime = getCurrentTime()
-            diffTime = round((self.endTime - self.startTime) / 1000, 3)
-            turtle.penup()
-            turtle.goto(0, 0)
-            turtle.write("共计用时:" + str(diffTime))
+        self.endTime = getCurrentTime()
+        diffTime = round((self.endTime - self.startTime) / 1000, 3)
+        turtle.penup()
+        turtle.goto(0, 0)
+        turtle.write("共计用时:" + str(diffTime))
+
         self.controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width,
                                                              self.height,
                                                              self.OBSTACLE_LIST, Point(100, 100))
@@ -200,6 +206,11 @@ class DrawUtils:
         self.queueList = self.controlUtil.outUserList
 
         self.fun_displayLoadInfo()
+
+        if self.fun_isFinished() is True:
+            self.REFRESH_TIMER.cancel()
+            print("refresh time is cancel..........................")
+            return
         self.REFRESH_TIMER = threading.Timer(1, self.fun_refresh)
         self.REFRESH_TIMER.start()
 
@@ -223,7 +234,14 @@ class DrawUtils:
     def fun_genUser(self):
 
         if len(self.OBSTACLE_LIST) == 0:
-            dest_num = random.randint(0, len(self.DEST_LIST) - 1)
+            # dest_num = random.randint(0, len(self.DEST_LIST) - 1)
+            if self.destIndex >= 200:
+                self.GEN_USERS_TIMER.cancel()
+                print("GEN_USERS_TIMER has stoped....")
+                return
+            dest_num = FileUtils.FileUtils.readDestFile()[self.destIndex]
+
+            self.destIndex = self.destIndex + 1
             print("障碍物列表为空， 未进行流量控制")
         else:
             print("流量控制中.................")
