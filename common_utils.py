@@ -31,3 +31,8 @@ def getRandomListByTime(msec, count):
         randomList.append(j)
     randomList.sort(reverse=False)
     return randomList
+
+def getDistance(startPosition, destPosition):
+    xDistance = (int(startPosition.x) - int(destPosition.x))
+    yDistance = (int(startPosition.y) - int(destPosition.y))
+    return int(math.sqrt((xDistance ** 2) + (yDistance ** 2)))

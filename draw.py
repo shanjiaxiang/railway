@@ -39,6 +39,8 @@ class DrawUtils:
         self.destIndex = 0
         self.drawLineUtil = DrawLineUtils.DrawLineUtils(6)
         self.drawLineUtil.turtleInit(6, self.DEST_LIST)
+        self.totalRatio = 0
+        self.ratioList = self.getRatioList(Point(100,100))
 
     def initPen(self):
         initCanvas(self.width, self.height)
@@ -158,7 +160,7 @@ class DrawUtils:
             inList.append(0)
             for user in queue.userList:
                 if user.inFlag is True:
-                        count = count + 1
+                    count = count + 1
             inList[queue.destId] = count
             print("queue out size:", inList[queue.destId])
         return inList
@@ -246,6 +248,49 @@ class DrawUtils:
             # model.startTime = getCurrentTime() + stamp
             self.ENTITIES_LIST.append(model)
 
+    def getRatioList(self, startPosition):
+        size = len(self.DEST_LIST)
+        distance = []
+        ratioList = []
+        # 计算距离列表
+        for x in range(size):
+            dis = getDistance(startPosition, self.DEST_LIST[x].position)
+            print(dis)
+            distance.append(dis)
+        total = 0
+        # 计算总距离
+        for dis in distance:
+            total = total + dis
+
+        ratioTemp = 0
+        # 计算各目标距离比例
+        for dis in distance:
+            ratio = int(round(total / dis, 2) * 100)
+            print("ratio:", ratio)
+            ratioTemp = ratioTemp + ratio
+            print("ratioTemp:", ratioTemp)
+            ratioList.append(ratioTemp)
+        self.totalRatio = ratioTemp
+        return ratioList
+
+    # 模拟人类遇险行为，选择目标点
+    def getNormalDest(self):
+        randomNum = random.randint(1, self.totalRatio)
+        for index in range(len(self.ratioList)):
+            print("index:", index)
+            print("index ratio:", self.ratioList[index])
+            if index == 0:
+                if 0 < randomNum <= self.ratioList[index]:
+                    return 0
+                else:
+                    print("index不为0，")
+            else:
+                if self.ratioList[index-1] < randomNum <= self.ratioList[index]:
+                    return index
+                else:
+                    print("random num:", randomNum)
+                    print("无匹配结果")
+
     # 定时生成user
     def fun_genUser(self):
 
@@ -258,14 +303,10 @@ class DrawUtils:
             dest_num = FileUtils.FileUtils.readDestFile()[self.destIndex]
 
             self.destIndex = self.destIndex + 1
-            print("障碍物列表为空， 未进行流量控制")
         else:
-            print("流量控制中.................")
-            # controlUtils = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height, self.OBSTACLE_LIST, Point(100, 100))
-            print("******开始时间", getCurrentTime())
-            dest_num = self.controlUtil.newPath(getCurrentTime())
-            print("******结束时间", getCurrentTime())
-            print("load balance dest_num:", dest_num)
+            dest_num = self.getNormalDest()
+            print("有灾难时，目标点", dest_num)
+            # dest_num = self.controlUtil.newPath(getCurrentTime())
         user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position)
         user.destId = dest_num
         self.ENTITIES_LIST.append(user)

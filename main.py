@@ -6,6 +6,7 @@ import turtle
 import draw
 from AStar import Array2D, AStar
 import threading
+from config import Configurations
 
 
 obstacles = []
@@ -171,29 +172,18 @@ def main():
     global newAstar
     global drawUtil
 
-    width = 200
-    height = 200
+    width = Configurations.width
+    height = Configurations.height
 
     initCanvasHere(width, height)
 
     obstacles = []
     obastacleUtil = DrawObstacleUtils.DrawObstacleUtils((width, height), obstacles)
-    # turtle.onscreenclick(onClick)
     turtle.onscreenclick(addObstacle)
-
-
-    # timer = threading.Timer(1, drawPosition)
-    # timer.start()
-
-    # drawUtil = draw.DrawUtils(50, 50, )
-    # drawUtil.OBSTACLE_LIST =
-    # draw.fun_genUsers()
-    # draw.fun_refresh()
     initDrawUtil(width, height, Point(50, 50))
 
 
     newMap = Array2D.Array2D(width, height)
-    # newAstar = AStar.AStar(newMap, Point(2, 4), Point(49, 49))
 
     turtle.mainloop()
     turtle.done()
