@@ -38,6 +38,7 @@ class DrawUtils:
         self.endTime = 0
         self.destIndex = 0
         self.drawLineUtil = DrawLineUtils.DrawLineUtils(6)
+        self.drawLineUtil.turtleInit(6, self.DEST_LIST)
 
     def initPen(self):
         initCanvas(self.width, self.height)
@@ -150,27 +151,42 @@ class DrawUtils:
             print("queue out size:", outList[queue.destId])
         return outList
 
+    def fun_calInQueueNum(self):
+        inList = []
+        for queue in self.queueList:
+            count = 0
+            inList.append(0)
+            for user in queue.userList:
+                if user.inFlag is True:
+                        count = count + 1
+            inList[queue.destId] = count
+            print("queue out size:", inList[queue.destId])
+        return inList
+
     def fun_displayLoadInfo(self):
         outList = self.fun_calQueueNum()
         turtle.penup()
-        turtle.goto(20, 190)
+        turtle.goto(10, 190)
         turtle.write("10s")
         turtle.penup()
-        turtle.goto(30, 190)
-        turtle.write("total")
+        turtle.goto(20, 190)
+        turtle.write("总计")
         for x in range(len(outList)):
             turtle.penup()
-            turtle.goto(20, 180 - 10 * x)
+            turtle.goto(0, 180 - 10 * x)
+            turtle.write(self.DEST_LIST[x].name)
+            turtle.penup()
+            turtle.goto(10, 180 - 10 * x)
             # upGoto(Point(20, 180 - 20 * x))
             turtle.write(str(outList[x]))
 
-        # _thread.start_new_thread(self.drawLines, (outList,))
-        self.drawLineUtil.drawLines(outList)
         for x in range(len(self.queueList)):
             turtle.penup()
-            turtle.goto(30, 180 - 10 * x)
+            turtle.goto(20, 180 - 10 * x)
             # upGoto(Point(20, 180 - 20 * x))
             turtle.write(len(self.queueList[x].userList))
+
+        self.drawLineUtil.drawTurtleLines(outList)
 
     def drawLines(self, outList):
         self.drawLineUtil.drawLines(outList)
@@ -191,7 +207,7 @@ class DrawUtils:
         self.endTime = getCurrentTime()
         diffTime = round((self.endTime - self.startTime) / 1000, 3)
         turtle.penup()
-        turtle.goto(0, 0)
+        turtle.goto(110, 0)
         turtle.write("共计用时:" + str(diffTime))
 
         self.controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width,
