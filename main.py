@@ -2,6 +2,7 @@
 from turtle_util import *
 from obstacle import SquareObstacle
 from obstacle import DrawObstacleUtils
+from turtle import TurtleScreen, RawTurtle, TK
 import turtle
 import draw
 from AStar import Array2D, AStar
@@ -176,6 +177,22 @@ def main():
     height = Configurations.height
 
     initCanvasHere(width, height)
+
+    # root = TK.Tk()
+    # root1 = TK.Tk()
+    # cv1 = TK.Canvas(root, width=300, height=200, bg="#ddffff")
+    # cv2 = TK.Canvas(root1, width=300, height=200, bg="#ffeeee")
+    # cv1.pack()
+    # cv2.pack()
+    #
+    # s1 = TurtleScreen(cv1)
+    # s1.bgcolor(0.85, 0.85, 1)
+    # s2 = TurtleScreen(cv2)
+    # s2.bgcolor(1, 0.85, 0.85)
+
+    p = RawTurtle(s1)
+    q = RawTurtle(s2)
+
 
     obstacles = []
     obastacleUtil = DrawObstacleUtils.DrawObstacleUtils((width, height), obstacles)

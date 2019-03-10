@@ -7,7 +7,8 @@ from bazier import *
 
 def initCanvas(x, y, color=None):
     turtle.screensize(x, y, color)
-
+    # turtle.setup(x, y, 100, 100)
+    # turtle.setup(0.9,0.9)
 
 def initPen(size, speed=1, color="black", show=True):
     if show:
@@ -35,6 +36,7 @@ def initPen(size, speed=1, color="black", show=True):
 
 def turtleSpeed(v):
     turtle.speed(v)
+
 
 #
 def showTurtle():
@@ -105,6 +107,8 @@ def drawArc(start, dest):
         t = t + 0.01
         point = calCurvePointWithControl(t, start, control, dest)
         drawPath(point)
+
+
 def drawArcByTimes(start, dest, times):
     drawPoint(start)
     drawPoint(dest)
@@ -113,8 +117,6 @@ def drawArcByTimes(start, dest, times):
     # 生成中垂线随机控制点
     control = calControlPoint(start, dest)
     for i in range(times):
-        t = t + 1/times
+        t = t + 1 / times
         point = calCurvePointWithControl(t, start, control, dest)
         drawPath(point)
-
-
