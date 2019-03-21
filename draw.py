@@ -40,7 +40,8 @@ class DrawUtils:
         self.drawLineUtil = DrawLineUtils.DrawLineUtils(6)
         self.drawLineUtil.turtleInit(6, self.DEST_LIST)
         self.totalRatio = 0
-        self.ratioList = self.getRatioList(Point(100,100))
+        self.ratioList = self.getRatioList(Point(100, 100))
+        self.USER_DEST_LIST = []
 
     def initPen(self):
         initCanvas(self.width, self.height)
@@ -140,7 +141,8 @@ class DrawUtils:
     # 10秒钟内各队列中有多少个已出闸机的
     def fun_calQueueNum(self):
         endTime = getCurrentTime()
-        startTime = endTime - 10000
+        # startTime = endTime - 10000
+        startTime = endTime - 20000
         outList = []
         for queue in self.queueList:
             count = 0
@@ -167,12 +169,14 @@ class DrawUtils:
 
     def fun_displayLoadInfo(self):
         outList = self.fun_calQueueNum()
+
         turtle.penup()
         turtle.goto(10, 190)
         turtle.write("10s")
         turtle.penup()
         turtle.goto(20, 190)
         turtle.write("总计")
+        tempStr = ""
         for x in range(len(outList)):
             turtle.penup()
             turtle.goto(0, 180 - 10 * x)
@@ -181,6 +185,9 @@ class DrawUtils:
             turtle.goto(10, 180 - 10 * x)
             # upGoto(Point(20, 180 - 20 * x))
             turtle.write(str(outList[x]))
+            tempStr += str(outList[x]) + ','
+        tempStr = tempStr[:-1] + "\n"
+        FileUtils.FileUtils.writeControlOutCountFile(tempStr)
 
         for x in range(len(self.queueList)):
             turtle.penup()
@@ -255,6 +262,8 @@ class DrawUtils:
         # 计算距离列表
         for x in range(size):
             dis = getDistance(startPosition, self.DEST_LIST[x].position)
+            if x == 1 or x == 4:
+                dis = dis /2
             print(dis)
             distance.append(dis)
         total = 0
@@ -285,7 +294,7 @@ class DrawUtils:
                 else:
                     print("index不为0，")
             else:
-                if self.ratioList[index-1] < randomNum <= self.ratioList[index]:
+                if self.ratioList[index - 1] < randomNum <= self.ratioList[index]:
                     return index
                 else:
                     print("random num:", randomNum)
@@ -293,20 +302,21 @@ class DrawUtils:
 
     # 定时生成user
     def fun_genUser(self):
-
+        # 读取点的重点列表
+        if len(self.USER_DEST_LIST) == 0:
+            self.USER_DEST_LIST = FileUtils.FileUtils.readDestFile()
         if len(self.OBSTACLE_LIST) == 0:
             # dest_num = random.randint(0, len(self.DEST_LIST) - 1)
-            if self.destIndex >= 200:
+            if self.destIndex >= len(self.USER_DEST_LIST):
                 self.GEN_USERS_TIMER.cancel()
                 print("GEN_USERS_TIMER has stoped....")
                 return
-            dest_num = FileUtils.FileUtils.readDestFile()[self.destIndex]
-
+            dest_num = self.USER_DEST_LIST[self.destIndex]
             self.destIndex = self.destIndex + 1
         else:
-            dest_num = self.getNormalDest()
-            print("有灾难时，目标点", dest_num)
-            # dest_num = self.controlUtil.newPath(getCurrentTime())
+            # dest_num = self.getNormalDest()
+            # print("有灾难时，目标点", dest_num)
+            dest_num = self.controlUtil.newPath(getCurrentTime())
         user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position)
         user.destId = dest_num
         self.ENTITIES_LIST.append(user)
@@ -332,11 +342,12 @@ class DrawUtils:
 
         # self.TIME_STAMP_LIST = getRandomListByTime(60000, 200)
         # f = open('data/data.txt','r')
-        self.TIME_STAMP_LIST = FileUtils.FileUtils.readFile()
+        if len(self.TIME_DIFF_LIST) == 0:
+            self.TIME_STAMP_LIST = FileUtils.FileUtils.readFile()
+            # 计算user生成事件间隔
+            self.TTIME_DIFF_LIST = self.getTimeStampDiff()
         print(len(self.TIME_STAMP_LIST))
         # self.TIME_STAMP_LIST = getRandomListByTime(3000, 1)
-        # 计算user生成事件间隔
-        self.TTIME_DIFF_LIST = self.getTimeStampDiff()
         self.GEN_USERS_TIMER = threading.Timer(1, self.fun_genUser)
         self.GEN_USERS_TIMER.start()
 

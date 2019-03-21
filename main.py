@@ -190,8 +190,8 @@ def main():
     # s2 = TurtleScreen(cv2)
     # s2.bgcolor(1, 0.85, 0.85)
 
-    p = RawTurtle(s1)
-    q = RawTurtle(s2)
+    # p = RawTurtle(s1)
+    # q = RawTurtle(s2)
 
 
     obstacles = []
