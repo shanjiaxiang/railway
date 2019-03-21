@@ -1,5 +1,8 @@
-# import matplotlib.pyplot as plt
-# import numpy as np
+#-*- coding: utf-8 -*-
+import matplotlib.pyplot as plt
+import matplotlib
+from pylab import *
+import numpy as np
 import _thread
 import turtle
 from point_model import *
@@ -14,24 +17,24 @@ class DrawLineUtils:
         self.preListY = []
         # self.initPlt(size)
 
-    # def initPlt(self, size):
-    #     plt.axis([0, 60, 0, 50])
-    #     plt.ion()
-    #     plt.xlabel("Time(10s)")
-    #     plt.ylabel("Points")
-    #     plt.title("各闸机10s内规划点数")
-    #     for i in range(size):
-    #         self.preListX.append(0)
-    #         self.preListY.append(0)
-    #
-    # def drawLines(self, curList):
-    #     for i in range(len(curList)):
-    #         x = self.preListX[i] + 1
-    #         y = curList[i]
-    #         plt.plot([self.preListX[i], x], [self.preListY[i], y], c=self.color[i])
-    #         self.preListX[i] = x
-    #         self.preListY[i] = y
-    #         plt.pause(0)
+    def initPlt(self, size):
+        plt.axis([0, 200, 0, 60])
+        plt.ion()
+        plt.xlabel("Time(10s)")
+        plt.ylabel("Points")
+        plt.title("各闸机10s内规划点数")
+        for i in range(size):
+            self.preListX.append(0)
+            self.preListY.append(0)
+
+    def drawLines(self, curList):
+        for i in range(len(curList)):
+            x = self.preListX[i] + 1
+            y = curList[i]
+            plt.plot([self.preListX[i], x], [self.preListY[i], y], c=self.color[i])
+            self.preListX[i] = x
+            self.preListY[i] = y
+            plt.pause(0)
 
     def turtleInit(self, size, destList):
         # for dest in destList:
@@ -95,6 +98,31 @@ class DrawLineUtils:
             self.preListX[i] = x
             self.preListY[i] = y
 
+def fun_pltDrawsLineChar():
+    # x2 = range(0, 10)
+    # y2 = [5, 8, 0, 30, 20, 40, 50, 10, 40, 15]
+    # plt.plot(x2, y2, label='second line')
+    # plt.xlabel('Plot Number')
+    # plt.ylabel('Important var')
+    # plt.title('Interesting Graph\nCheck it out')
+    # plt.legend()
+    # plt.show()
+    list = []
+    x= 1
+    plt.ylim(0, 35)
+    f = open(r'..\data1.txt', 'r')
+    for line in f.readlines():
+        num = int(str(line).split(',')[x-1])
+        list.append(num)
+    x2 = range(0, 140)
+    y2 = list
+    plt.plot(x2, y2, label='闸机'+str(x)+'流量')
+    plt.ylabel('人数')
+    plt.xlabel('时间(秒)')
+    plt.title('有流量控制')
+    plt.legend()
+    plt.show()
+
 
 def initCanvasHere(width, height):
     initCanvas(width, height)
@@ -133,3 +161,4 @@ def initCanvas(x, y, color=None):
 # #     print("drawing")
 # util.drawTurtleLineSingle()
 # turtle.done()
+fun_pltDrawsLineChar()
