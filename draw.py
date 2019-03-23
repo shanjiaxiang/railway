@@ -15,14 +15,21 @@ import _thread
 
 
 class DrawUtils:
-    def __init__(self, width, height, startPoint, destList):
+    def __init__(self, width, height, startPoint, destList, startPoint2, destList2):
         self.width = width
         self.height = height
         self.startPoint = startPoint
+        self.startPoint2 = startPoint2
 
         self.OBSTACLE_LIST = []
+        self.OBSTACLE_LIST2 = []
+
         self.DEST_LIST = destList
+        self.DEST_LIST2 = destList2
+
         self.ENTITIES_LIST = []
+        self.ENTITIES_LIST2 = []
+
         self.TIME_STAMP_LIST = []
         self.TIME_DIFF_LIST = []
         self.TIME_STAMP = 0
@@ -43,6 +50,8 @@ class DrawUtils:
         self.ratioList = self.getRatioList(Point(100, 100))
         self.USER_DEST_LIST = []
 
+        self.updateTime = 0
+
     def initPen(self):
         initCanvas(self.width, self.height)
         hideTurtle()
@@ -62,16 +71,17 @@ class DrawUtils:
             penDown()
             turtle.write(model.name)
 
-    def fun_updateUserPosition(self, list):
+    def fun_updateUserPosition(self, list, destList):
         # 清除当前显示的所有点
-        clear()
-        self.drawDestination(self.DEST_LIST)
+        # clear()
+        self.drawDestination(destList)
+        # self.drawDestination(self.DEST_LIST2)
         # controlUtils = LoadBalanceUtils.LoadBalanceUtils(list, self.DEST_LIST, self.width, self.height,
         #                                                              self.OBSTACLE_LIST)
         for user in list:
             # 点还在规划区域内
             if user.inFlag is True:
-                timeStamp = getCurrentTime()
+                timeStamp = self.updateTime
                 # 判断是否需要修改终点位置
                 # if controlUtils.getNewDest(user, timeStamp):
                 #     print("终点位置已修改")
@@ -85,7 +95,8 @@ class DrawUtils:
                         user.destChanged = False
                         user = UserModel(user.currPosition, user.destPosition)
 
-                    user.setCurrentTime()
+                    # user.setCurrentTime(getCurrentTime())
+                    user.setCurrentTime(timeStamp)
                     t = user.standardTime
                     # 贝塞尔取现路径超时，设置下一点目标为终点，已走出规划区
                     if t >= 1.0:
@@ -201,17 +212,27 @@ class DrawUtils:
         self.drawLineUtil.drawLines(outList)
 
     def fun_isFinished(self):
-        flag = True
+        flag = False
+        flag1 = False
         for user in self.ENTITIES_LIST:
             if user.inFlag:
                 flag = False
                 break
-        return flag
+        for user in self.ENTITIES_LIST2:
+            if user.inFlag:
+                flag1 = True
+                break
+        if flag is True and flag1 is True:
+            return True
+        else:
+            return False
 
     # 定时执行任务
     def fun_refresh(self):
-
-        self.fun_updateUserPosition(self.ENTITIES_LIST)
+        clear()
+        self.updateTime = getCurrentTime()
+        self.fun_updateUserPosition(self.ENTITIES_LIST, self.DEST_LIST)
+        self.fun_updateUserPosition(self.ENTITIES_LIST2, self.DEST_LIST2)
 
         self.endTime = getCurrentTime()
         diffTime = round((self.endTime - self.startTime) / 1000, 3)
@@ -263,7 +284,7 @@ class DrawUtils:
         for x in range(size):
             dis = getDistance(startPosition, self.DEST_LIST[x].position)
             if x == 1 or x == 4:
-                dis = dis /2
+                dis = dis / 2
             print(dis)
             distance.append(dis)
         total = 0
@@ -317,9 +338,24 @@ class DrawUtils:
             # dest_num = self.getNormalDest()
             # print("有灾难时，目标点", dest_num)
             dest_num = self.controlUtil.newPath(getCurrentTime())
-        user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position)
+        speed = calRandSpeed()
+        startTime = getCurrentTime()
+        print("speed: ", speed)
+        print("startTime:", startTime)
+        user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position, speed, startTime)
+        user2 = UserModel(Point(300, 100), self.DEST_LIST2[dest_num].position, speed, startTime)
+        # 保证控制点一致
+        user2.setControlPoint(Point(user.getControlPoint().x + 200, user.getControlPoint().y))
+        print("control user x:", user.getControlPoint().x, ", y:",user.getControlPoint().y)
+        print("control user2 x:", user2.getControlPoint().x, ", y:",user2.getControlPoint().y)
+        print("speed: ", user.speed)
+        print("speed: ", user2.speed)
+        print("startTime: ", user.startTime)
+        print("startTime: ", user2.startTime)
         user.destId = dest_num
+        user2.destId = dest_num
         self.ENTITIES_LIST.append(user)
+        self.ENTITIES_LIST2.append(user2)
 
         if (self.COUNT < len(self.TTIME_DIFF_LIST)):
             countTime = round(self.TTIME_DIFF_LIST[self.COUNT] / 1000, 3)
@@ -328,7 +364,7 @@ class DrawUtils:
         # 如果当前所有点已经添加,停止定时器，返回到主程序
         if (self.COUNT >= len(self.TIME_STAMP_LIST)):
             self.GEN_USERS_TIMER.cancel()
-            print("TIMER1 has stoped....")
+            print("GEN_USERS_TIMER has stoped....")
             return
         else:
             self.GEN_USERS_TIMER = threading.Timer(countTime, self.fun_genUser)
@@ -338,6 +374,7 @@ class DrawUtils:
     def fun_genUsers(self):
         self.startTime = getCurrentTime()
         self.drawDestination(self.DEST_LIST)
+        self.drawDestination(self.DEST_LIST2)
         # 产生随机时间戳，用于计算user生成事件间隔
 
         # self.TIME_STAMP_LIST = getRandomListByTime(60000, 200)

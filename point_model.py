@@ -32,7 +32,7 @@ class UserModel:
     waitTime = 0
     destId = 0
 
-    def __init__(self, start, dest, speed=0):
+    def __init__(self, start, dest, speed=0, startTime=0):
         self.startPosition = start
         self.destPosition = dest
         self.prePosition = start
@@ -44,7 +44,11 @@ class UserModel:
             self.speed = speed
         self.distance = self.calDistance()
         self.totalTime = self.calTotalTime()
-        self.startTime = getCurrentTime()
+        # self.startTime = getCurrentTime()
+        if startTime == 0:
+            self.startTime = getCurrentTime()
+        else:
+            self.startTime  = startTime
         self.currentTime = self.startTime
         self.destTime = self.startTime + self.totalTime
         # 时间t， 用在贝塞尔曲线公式中，用于计算当前时间所在点的位置
@@ -52,12 +56,19 @@ class UserModel:
         self.pathList = []
         self.destChanged = False
 
-    def setControlPoint(self):
-        controlPositon = bazier.calControlPoint(self.startPosition, self.destPosition)
-        return controlPositon
+    def setControlPoint(self, controlPoint=None):
+        if controlPoint is None:
+            controlPoint = bazier.calControlPoint(self.startPosition, self.destPosition)
+        else:
+            self.controlPositon = controlPoint
+        return controlPoint
 
-    def setCurrentTime(self):
-        self.currentTime = getCurrentTime()
+    def getControlPoint(self):
+        return self.controlPositon
+
+
+    def setCurrentTime(self, curTime):
+        self.currentTime = curTime
         self.setStandardTime()
 
     def setStandardTime(self):

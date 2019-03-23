@@ -9,8 +9,9 @@ from AStar import Array2D, AStar
 import threading
 from config import Configurations
 
-
 obstacles = []
+obstacles2 = []
+
 obastacleUtil = None
 drawUtil = None
 newMap = None
@@ -66,6 +67,7 @@ def onClick(x, y):
     # newAstar.getMap2D().showArray2D()
     # print("end-------------------")
 
+
 def addObstacle(x, y):
     global obstacles
     global drawUtil
@@ -76,7 +78,10 @@ def addObstacle(x, y):
         return
     else:
         # obstacles.append(obstacle)
-        drawUtil.OBSTACLE_LIST = obstacles
+        if x >150:
+            drawUtil.OBSTACLE_LIST2 = obstacles
+        else:
+            drawUtil.OBSTACLE_LIST = obstacles
         print("after add size:", len(drawUtil.OBSTACLE_LIST))
 
 
@@ -151,7 +156,8 @@ def drawPosition():
     timer = threading.Timer(1, drawPosition)
     timer.start()
 
-def initDrawUtil(width, height, startPoint):
+
+def initDrawUtil(width, height, startPoint, startPoint2):
     global drawUtil
     dests = []
     dests.append(DestinationModel(0, "闸机1", Point(50, 50)))
@@ -161,7 +167,16 @@ def initDrawUtil(width, height, startPoint):
     dests.append(DestinationModel(4, "闸机5", Point(150, 100)))
     dests.append(DestinationModel(5, "闸机6", Point(150, 150)))
 
-    drawUtil = draw.DrawUtils(width, height, startPoint, dests)
+    dests2 = []
+    dests2.append(DestinationModel(0, "闸机1", Point(250, 50)))
+    dests2.append(DestinationModel(1, "闸机2", Point(250, 100)))
+    dests2.append(DestinationModel(2, "闸机3", Point(250, 150)))
+    dests2.append(DestinationModel(3, "闸机4", Point(350, 50)))
+    dests2.append(DestinationModel(4, "闸机5", Point(350, 100)))
+    dests2.append(DestinationModel(5, "闸机6", Point(350, 150)))
+    # drawUtil2 = draw.DrawUtils(width, height, startPoint2, dests2)
+
+    drawUtil = draw.DrawUtils(width, height, startPoint, dests, startPoint2, dests2)
     drawUtil.fun_genUsers()
     drawUtil.startRefresh()
 
@@ -193,12 +208,11 @@ def main():
     # p = RawTurtle(s1)
     # q = RawTurtle(s2)
 
-
     obstacles = []
-    obastacleUtil = DrawObstacleUtils.DrawObstacleUtils((width, height), obstacles)
+    obstacles2 = []
+    obastacleUtil = DrawObstacleUtils.DrawObstacleUtils((width, height), obstacles, obstacles2)
     turtle.onscreenclick(addObstacle)
-    initDrawUtil(width, height, Point(50, 50))
-
+    initDrawUtil(width, height, Point(50, 50),Point(250, 50))
 
     newMap = Array2D.Array2D(width, height)
 

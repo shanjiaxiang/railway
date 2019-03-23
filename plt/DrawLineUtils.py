@@ -161,4 +161,4 @@ def initCanvas(x, y, color=None):
 # #     print("drawing")
 # util.drawTurtleLineSingle()
 # turtle.done()
-fun_pltDrawsLineChar()
+# fun_pltDrawsLineChar()
