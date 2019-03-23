@@ -15,14 +15,14 @@ import _thread
 
 
 class DrawUtils:
-    def __init__(self, width, height, startPoint, destList, startPoint2, destList2):
+    def __init__(self, width, height, startPoint, destList, startPoint2, destList2, obstacles, obstalces2):
         self.width = width
         self.height = height
         self.startPoint = startPoint
         self.startPoint2 = startPoint2
 
-        self.OBSTACLE_LIST = []
-        self.OBSTACLE_LIST2 = []
+        self.OBSTACLE_LIST = obstacles
+        self.OBSTACLE_LIST2 = obstalces2
 
         self.DEST_LIST = destList
         self.DEST_LIST2 = destList2
@@ -38,9 +38,13 @@ class DrawUtils:
         self.REFRESH_TIMER = threading.Timer
         self.hasObstacle = False
         self.queueList = []
+        self.queueList2 = []
         self.controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width,
                                                              self.height,
                                                              self.OBSTACLE_LIST, Point(100, 100))
+        self.controlUtil2 = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST2, self.DEST_LIST2, self.width,
+                                                              self.height,
+                                                              self.OBSTACLE_LIST2, Point(300, 100))
         self.startTime = 0
         self.endTime = 0
         self.destIndex = 0
@@ -51,6 +55,11 @@ class DrawUtils:
         self.USER_DEST_LIST = []
 
         self.updateTime = 0
+        self.outList = []
+        self.outList2 =[]
+        self.drawPointList = []
+        self.drawPointList2 = []
+
 
     def initPen(self):
         initCanvas(self.width, self.height)
@@ -72,6 +81,7 @@ class DrawUtils:
             turtle.write(model.name)
 
     def fun_updateUserPosition(self, list, destList):
+        drawPointList = []
         # 清除当前显示的所有点
         # clear()
         self.drawDestination(destList)
@@ -123,8 +133,10 @@ class DrawUtils:
                 user.currPosition = currentPoint
 
                 drawPoint(currentPoint)
+                drawPointList.append(currentPoint)
             else:
                 user.inFlag = False
+        return drawPointList
 
     def isInObstaclesArea(self, point):
         for obs in self.OBSTACLE_LIST:
@@ -150,12 +162,12 @@ class DrawUtils:
                 user.inFlag = False
 
     # 10秒钟内各队列中有多少个已出闸机的
-    def fun_calQueueNum(self):
+    def fun_calQueueNum(self, queueList):
         endTime = getCurrentTime()
         # startTime = endTime - 10000
         startTime = endTime - 20000
         outList = []
-        for queue in self.queueList:
+        for queue in queueList:
             count = 0
             outList.append(0)
             for user in queue.userList:
@@ -179,7 +191,11 @@ class DrawUtils:
         return inList
 
     def fun_displayLoadInfo(self):
-        outList = self.fun_calQueueNum()
+        # 過去10秒出閘機流量
+        outList = self.fun_calQueueNum(self.queueList)
+        outList2 = self.fun_calQueueNum(self.queueList2)
+
+
 
         turtle.penup()
         turtle.goto(10, 190)
@@ -207,6 +223,7 @@ class DrawUtils:
             turtle.write(len(self.queueList[x].userList))
 
         self.drawLineUtil.drawTurtleLines(outList)
+        return outList, outList2
 
     def drawLines(self, outList):
         self.drawLineUtil.drawLines(outList)
@@ -231,8 +248,9 @@ class DrawUtils:
     def fun_refresh(self):
         clear()
         self.updateTime = getCurrentTime()
-        self.fun_updateUserPosition(self.ENTITIES_LIST, self.DEST_LIST)
-        self.fun_updateUserPosition(self.ENTITIES_LIST2, self.DEST_LIST2)
+        # 需要绘制的点的列表
+        self.drawPointList = self.fun_updateUserPosition(self.ENTITIES_LIST, self.DEST_LIST)
+        self.drawPointList2 = self.fun_updateUserPosition(self.ENTITIES_LIST2, self.DEST_LIST2)
 
         self.endTime = getCurrentTime()
         diffTime = round((self.endTime - self.startTime) / 1000, 3)
@@ -243,15 +261,21 @@ class DrawUtils:
         self.controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width,
                                                              self.height,
                                                              self.OBSTACLE_LIST, Point(100, 100))
-
+        self.controlUtil2 = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST2, self.DEST_LIST2, self.width,
+                                                              self.height,
+                                                              self.OBSTACLE_LIST2, Point(300, 100))
         # controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height,
         #                                                  self.OBSTACLE_LIST, Point(100, 100))
         print("_____________________controlUtil")
         print(len(self.controlUtil.outUserList))
         # print(len(controlUtil.outUserList))
+        # 10秒走出闸机的列表
         self.queueList = self.controlUtil.outUserList
+        self.queueList2 = self.controlUtil2.outUserList
+        self.outList, self.outList2 = self.fun_displayLoadInfo()
 
-        self.fun_displayLoadInfo()
+        FileUtils.FileUtils.writeOutFlow(self.outList, self.outList2)
+        FileUtils.FileUtils.writePointSet(self.drawPointList, self.drawPointList2)
 
         if self.fun_isFinished() is True:
             self.REFRESH_TIMER.cancel()
@@ -326,24 +350,25 @@ class DrawUtils:
         # 读取点的重点列表
         if len(self.USER_DEST_LIST) == 0:
             self.USER_DEST_LIST = FileUtils.FileUtils.readDestFile()
-        if len(self.OBSTACLE_LIST) == 0:
+        if len(self.OBSTACLE_LIST) == 0 :
             # dest_num = random.randint(0, len(self.DEST_LIST) - 1)
             if self.destIndex >= len(self.USER_DEST_LIST):
                 self.GEN_USERS_TIMER.cancel()
                 print("GEN_USERS_TIMER has stoped....")
                 return
             dest_num = self.USER_DEST_LIST[self.destIndex]
+            dest_num2 = dest_num
             self.destIndex = self.destIndex + 1
         else:
-            # dest_num = self.getNormalDest()
+            dest_num = self.getNormalDest()
             # print("有灾难时，目标点", dest_num)
-            dest_num = self.controlUtil.newPath(getCurrentTime())
+            dest_num2 = self.controlUtil.newPath(getCurrentTime())
         speed = calRandSpeed()
         startTime = getCurrentTime()
         print("speed: ", speed)
         print("startTime:", startTime)
         user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position, speed, startTime)
-        user2 = UserModel(Point(300, 100), self.DEST_LIST2[dest_num].position, speed, startTime)
+        user2 = UserModel(Point(300, 100), self.DEST_LIST2[dest_num2].position, speed, startTime)
         # 保证控制点一致
         user2.setControlPoint(Point(user.getControlPoint().x + 200, user.getControlPoint().y))
         print("control user x:", user.getControlPoint().x, ", y:",user.getControlPoint().y)

@@ -13,6 +13,7 @@ class DrawObstacleUtils:
         self.mapSize = mapSize
         self.turtle_obstacle = turtle.RawTurtle(turtle.getscreen())
         self.turtle_obstacle.hideturtle()
+        self.fun_drawObstacles()
 
     def drawObstacle(self, obstacle):
         print("obstacle:", obstacle.minX, obstacle.minY, obstacle.maxX, obstacle.maxY)
@@ -45,9 +46,9 @@ class DrawObstacleUtils:
     # 绘制所有的障碍物
     def fun_drawObstacles(self):
         for obstacle in self.obstacles:
-            drawObstacle(obstacle)
+            self.drawObstacle(obstacle)
         for obstacle in self.obstacles2:
-            drawObstacle(obstacle)
+            self.drawObstacle(obstacle)
 
     # 获得点击位置
     def getClickPoint(self, x, y):
@@ -64,14 +65,25 @@ class DrawObstacleUtils:
         print("click x:", x, "y:", y)
         if not self.isClickInObstacle(x, y):
             obstacle = SquareObstacle.SquareObstacle(Point(x, y), Point(x + 10, y + 10))
-            if x >150:
+            obstacle1 = SquareObstacle.SquareObstacle(Point(x - 200, y), Point(x + 10 - 200, y + 10))
+            obstacle2 = SquareObstacle.SquareObstacle(Point(x + 200, y), Point(x + 10 + 200, y + 10))
+            if x > 150:
                 self.obstacles2.append(obstacle)
+                self.obstacles.append(obstacle1)
+                self.drawObstacle(obstacle1)
             else:
                 self.obstacles.append(obstacle)
+                self.obstacles2.append(obstacle2)
+                self.drawObstacle(obstacle2)
             self.drawObstacle(obstacle)
             return obstacle
         else:
             return None
+
+    def getObstacles(self):
+        return self.obstacles
+    def getObstacles1(self):
+        return self.obstacles2
 
     def convertTurtleToMap(self, point):
         newPoint = Point(0, 0)
@@ -81,9 +93,6 @@ class DrawObstacleUtils:
 
     def getClickPoint1(self, x, y):
         print("clicked x:", x, "y:", y)
-
-    def getObstacles(self):
-        return self.obstacles
 
     def getObstacles2(self):
         return self.obstacles

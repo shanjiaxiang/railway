@@ -25,7 +25,7 @@ class FileUtils:
     def writeDestFile(destSize, pointSize):
         f = open(r'..\data\dest.txt', 'w')
         for i in range(pointSize):
-            f.write(str(random.randint(0, destSize-1))+'\n')
+            f.write(str(random.randint(0, destSize - 1)) + '\n')
 
     @staticmethod
     def readDestFile():
@@ -38,7 +38,7 @@ class FileUtils:
         return listIndex
 
     @staticmethod
-    def writeOutCountFile( count):
+    def writeOutCountFile(count):
         f = open(r'data.txt', 'a+')
         f.write(count)
 
@@ -47,6 +47,27 @@ class FileUtils:
         f = open(r'data1.txt', 'a+')
         f.write(count)
 
+    @staticmethod
+    def writeOutFlow(rawList, controlList):
+        f = open(r'outFlow.txt', 'a+')
+        for x in rawList:
+            f.write(str(x) + ',')
+        for y in controlList:
+            f.write(str(y) + ',')
+        f.write('\n')
+
+    @staticmethod
+    def writePointSet(rawList, controlList):
+        f = open(r'RawPointSet.txt', 'a+')
+        for x in rawList:
+            f.write('(' + str(x.x) + ',' + str(x.y) + ')')
+            f.write(',')
+        f.write('\n')
+        f = open(r'ControlPointSet.txt', 'a+')
+        for y in controlList:
+            f.write('(' + str(y.x) + ',' + str(y.y) + ')')
+            f.write(',')
+        f.write('\n')
 # FileUtils.writeFile()
 # FileUtils.readFile()
 

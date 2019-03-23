@@ -70,6 +70,7 @@ def onClick(x, y):
 
 def addObstacle(x, y):
     global obstacles
+    global obstacles2
     global drawUtil
     global obastacleUtil
     # 是否生成障碍物
@@ -78,10 +79,14 @@ def addObstacle(x, y):
         return
     else:
         # obstacles.append(obstacle)
-        if x >150:
-            drawUtil.OBSTACLE_LIST2 = obstacles
-        else:
-            drawUtil.OBSTACLE_LIST = obstacles
+        # if x >150:
+        #     drawUtil.OBSTACLE_LIST2 = obstacles
+        # else:
+        #     drawUtil.OBSTACLE_LIST = obstacles
+        drawUtil.OBSTACLE_LIST = obastacleUtil.getObstacles()
+        drawUtil.OBSTACLE_LIST1 = obastacleUtil.getObstacles1()
+        obstacles = obastacleUtil.getObstacles()
+        obstacles2 = obastacleUtil.getObstacles1()
         print("after add size:", len(drawUtil.OBSTACLE_LIST))
 
 
@@ -176,7 +181,7 @@ def initDrawUtil(width, height, startPoint, startPoint2):
     dests2.append(DestinationModel(5, "闸机6", Point(350, 150)))
     # drawUtil2 = draw.DrawUtils(width, height, startPoint2, dests2)
 
-    drawUtil = draw.DrawUtils(width, height, startPoint, dests, startPoint2, dests2)
+    drawUtil = draw.DrawUtils(width, height, startPoint, dests, startPoint2, dests2, obstacles, obstacles2)
     drawUtil.fun_genUsers()
     drawUtil.startRefresh()
 
@@ -210,6 +215,10 @@ def main():
 
     obstacles = []
     obstacles2 = []
+    obstacles.append(SquareObstacle.SquareObstacle(Point(100, 60), Point(100 + 10, 60 + 10)))
+    obstacles.append(SquareObstacle.SquareObstacle(Point(130, 90), Point(130 + 10, 90 + 10)))
+    obstacles2.append(SquareObstacle.SquareObstacle(Point(300, 60), Point(300 + 10, 60 + 10)))
+    obstacles2.append(SquareObstacle.SquareObstacle(Point(330, 90), Point(330 + 10, 90 + 10)))
     obastacleUtil = DrawObstacleUtils.DrawObstacleUtils((width, height), obstacles, obstacles2)
     turtle.onscreenclick(addObstacle)
     initDrawUtil(width, height, Point(50, 50),Point(250, 50))
