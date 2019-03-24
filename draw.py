@@ -125,7 +125,7 @@ class DrawUtils:
                 if self.isInObstaclesArea(currentPoint) is True:
                     #  重新规划路径
                     print("规划的点在障碍物内， 重新规划")
-                    self.getAstarPath(user, timeStamp)
+                    self.getAstarPath2(user, timeStamp)
                     currentPoint = user.calNextPostition()
 
                 user.prePosition = user.currPosition
@@ -139,6 +139,12 @@ class DrawUtils:
 
     def isInObstaclesArea(self, point):
         for obs in self.OBSTACLE_LIST:
+            # 判断下一个目标点是否在障碍物内
+            # print("在障碍物列表中...")
+            if (obs.minX < point.x < obs.maxX) and \
+                    (obs.minY < point.y < obs.maxY):
+                return True
+        for obs in self.OBSTACLE_LIST2:
             # 判断下一个目标点是否在障碍物内
             # print("在障碍物列表中...")
             if (obs.minX < point.x < obs.maxX) and \
@@ -420,6 +426,26 @@ class DrawUtils:
         print("destPosition x:", user.destPosition.x, ",y:", user.destPosition.y)
         destPoint = Point(int(user.destPosition.x), int(user.destPosition.y))
         newAstar = AStar.AStar(newMap, user.currPosition, destPoint)
+        newAstar.addAllObastacleArea(self.OBSTACLE_LIST)
+        user.pathList = newAstar.start()
+        if user.pathList is not None and len(user.pathList) > 0:
+            print("路径重新规划")
+        else:
+            print("位置已在障碍物区域内部，无法重新规划")
+            user.inFlag = False
+        user.startTime = startTime
+        user.currentTime = getCurrentTime()
+        user.distance = self.calPathLength(user.pathList)
+        user.totalTime = round(user.distance / user.speed, 3) * 1000
+        user.destTime = user.startTime + user.totalTime
+
+    def getAstarPath2(self, user, startTime):
+        newMap = Array2D.Array2D(self.width, self.height)
+        print("currPosition x:", user.currPosition.x, ",y:", user.currPosition.y)
+        print("destPosition x:", user.destPosition.x, ",y:", user.destPosition.y)
+        destPoint = Point(int(user.destPosition.x), int(user.destPosition.y))
+        newAstar = AStar.AStar(newMap, user.currPosition, destPoint)
+        newAstar.addAllObastacleArea(self.OBSTACLE_LIST2)
         newAstar.addAllObastacleArea(self.OBSTACLE_LIST)
         user.pathList = newAstar.start()
         if user.pathList is not None and len(user.pathList) > 0:
