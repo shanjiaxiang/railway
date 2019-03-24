@@ -8,7 +8,7 @@ from bazier import *
 def initCanvas(x, y, color=None):
     turtle.screensize(x, y, color)
     # turtle.setup(x, y, 100, 100)
-    # turtle.setup(0.9,0.9)
+    turtle.setup(0.8,0.8)
 
 def initPen(size, speed=1, color="black", show=True):
     if show:

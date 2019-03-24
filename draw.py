@@ -56,10 +56,9 @@ class DrawUtils:
 
         self.updateTime = 0
         self.outList = []
-        self.outList2 =[]
+        self.outList2 = []
         self.drawPointList = []
         self.drawPointList2 = []
-
 
     def initPen(self):
         initCanvas(self.width, self.height)
@@ -195,34 +194,30 @@ class DrawUtils:
         outList = self.fun_calQueueNum(self.queueList)
         outList2 = self.fun_calQueueNum(self.queueList2)
 
-
-
-        turtle.penup()
-        turtle.goto(10, 190)
-        turtle.write("10s")
-        turtle.penup()
-        turtle.goto(20, 190)
-        turtle.write("总计")
+        # turtle.penup()
+        # turtle.goto(10, 190)
+        # turtle.write("10s")
+        # turtle.penup()
+        # turtle.goto(20, 190)
+        # turtle.write("总计")
         tempStr = ""
         for x in range(len(outList)):
-            turtle.penup()
-            turtle.goto(0, 180 - 10 * x)
-            turtle.write(self.DEST_LIST[x].name)
-            turtle.penup()
-            turtle.goto(10, 180 - 10 * x)
-            # upGoto(Point(20, 180 - 20 * x))
-            turtle.write(str(outList[x]))
+            # turtle.penup()
+            # turtle.goto(0, 180 - 10 * x)
+            # turtle.write(self.DEST_LIST[x].name)
+            # turtle.penup()
+            # turtle.goto(10, 180 - 10 * x)
+            # turtle.write(str(outList[x]))
             tempStr += str(outList[x]) + ','
         tempStr = tempStr[:-1] + "\n"
         FileUtils.FileUtils.writeControlOutCountFile(tempStr)
 
-        for x in range(len(self.queueList)):
-            turtle.penup()
-            turtle.goto(20, 180 - 10 * x)
-            # upGoto(Point(20, 180 - 20 * x))
-            turtle.write(len(self.queueList[x].userList))
+        # for x in range(len(self.queueList)):
+        #     turtle.penup()
+        #     turtle.goto(20, 180 - 10 * x)
+        #     turtle.write(len(self.queueList[x].userList))
 
-        self.drawLineUtil.drawTurtleLines(outList)
+        # self.drawLineUtil.drawTurtleLines(outList)
         return outList, outList2
 
     def drawLines(self, outList):
@@ -253,10 +248,10 @@ class DrawUtils:
         self.drawPointList2 = self.fun_updateUserPosition(self.ENTITIES_LIST2, self.DEST_LIST2)
 
         self.endTime = getCurrentTime()
-        diffTime = round((self.endTime - self.startTime) / 1000, 3)
-        turtle.penup()
-        turtle.goto(110, 0)
-        turtle.write("共计用时:" + str(diffTime))
+        # diffTime = round((self.endTime - self.startTime) / 1000, 3)
+        # turtle.penup()
+        # turtle.goto(110, 0)
+        # turtle.write("共计用时:" + str(diffTime))
 
         self.controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width,
                                                              self.height,
@@ -264,18 +259,16 @@ class DrawUtils:
         self.controlUtil2 = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST2, self.DEST_LIST2, self.width,
                                                               self.height,
                                                               self.OBSTACLE_LIST2, Point(300, 100))
-        # controlUtil = LoadBalanceUtils.LoadBalanceUtils(self.ENTITIES_LIST, self.DEST_LIST, self.width, self.height,
-        #                                                  self.OBSTACLE_LIST, Point(100, 100))
         print("_____________________controlUtil")
         print(len(self.controlUtil.outUserList))
-        # print(len(controlUtil.outUserList))
         # 10秒走出闸机的列表
         self.queueList = self.controlUtil.outUserList
         self.queueList2 = self.controlUtil2.outUserList
         self.outList, self.outList2 = self.fun_displayLoadInfo()
 
         FileUtils.FileUtils.writeOutFlow(self.outList, self.outList2)
-        FileUtils.FileUtils.writePointSet(self.drawPointList, self.drawPointList2)
+        # FileUtils.FileUtils.writePointSet(self.drawPointList, self.drawPointList2)
+        self.drawLineUtil.turtleDrawLineCharts(self.outList, self.outList2)
 
         if self.fun_isFinished() is True:
             self.REFRESH_TIMER.cancel()
@@ -350,7 +343,7 @@ class DrawUtils:
         # 读取点的重点列表
         if len(self.USER_DEST_LIST) == 0:
             self.USER_DEST_LIST = FileUtils.FileUtils.readDestFile()
-        if len(self.OBSTACLE_LIST) == 0 :
+        if len(self.OBSTACLE_LIST) == 0:
             # dest_num = random.randint(0, len(self.DEST_LIST) - 1)
             if self.destIndex >= len(self.USER_DEST_LIST):
                 self.GEN_USERS_TIMER.cancel()
@@ -360,25 +353,20 @@ class DrawUtils:
             dest_num2 = dest_num
             self.destIndex = self.destIndex + 1
         else:
+            print("有灾难")
             dest_num = self.getNormalDest()
             # print("有灾难时，目标点", dest_num)
-            dest_num2 = self.controlUtil.newPath(getCurrentTime())
+            dest_num2 = self.controlUtil2.newPath(getCurrentTime())
         speed = calRandSpeed()
         startTime = getCurrentTime()
-        print("speed: ", speed)
-        print("startTime:", startTime)
+        print("dest1:", dest_num)
+        print("dest2:", dest_num2)
         user = UserModel(Point(100, 100), self.DEST_LIST[dest_num].position, speed, startTime)
         user2 = UserModel(Point(300, 100), self.DEST_LIST2[dest_num2].position, speed, startTime)
         # 保证控制点一致
         user2.setControlPoint(Point(user.getControlPoint().x + 200, user.getControlPoint().y))
-        print("control user x:", user.getControlPoint().x, ", y:",user.getControlPoint().y)
-        print("control user2 x:", user2.getControlPoint().x, ", y:",user2.getControlPoint().y)
-        print("speed: ", user.speed)
-        print("speed: ", user2.speed)
-        print("startTime: ", user.startTime)
-        print("startTime: ", user2.startTime)
         user.destId = dest_num
-        user2.destId = dest_num
+        user2.destId = dest_num2
         self.ENTITIES_LIST.append(user)
         self.ENTITIES_LIST2.append(user2)
 

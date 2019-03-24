@@ -164,6 +164,8 @@ def drawPosition():
 
 def initDrawUtil(width, height, startPoint, startPoint2):
     global drawUtil
+    global obstacles
+    global obstacles2
     dests = []
     dests.append(DestinationModel(0, "闸机1", Point(50, 50)))
     dests.append(DestinationModel(1, "闸机2", Point(50, 100)))
@@ -188,6 +190,7 @@ def initDrawUtil(width, height, startPoint, startPoint2):
 
 def main():
     global obstacles
+    global obstacles2
     global obastacleUtil
     global newMap
     global newAstar
