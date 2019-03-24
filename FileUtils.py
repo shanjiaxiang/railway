@@ -14,7 +14,7 @@ class FileUtils:
     @staticmethod
     def readFile():
         listTime = []
-        f = open(r'data\data.txt', 'r')
+        f = open(r'data.txt', 'r')
         for line in f.readlines():
             newLine = int(line)
             if newLine != 0:
@@ -30,7 +30,7 @@ class FileUtils:
     @staticmethod
     def readDestFile():
         listIndex = []
-        f = open(r'data\dest.txt', 'r')
+        f = open(r'dest.txt', 'r')
         for line in f.readlines():
             newLine = int(line)
             if newLine != 0:
@@ -39,12 +39,12 @@ class FileUtils:
 
     @staticmethod
     def writeOutCountFile(count):
-        f = open(r'data.txt', 'a+')
+        f = open(r'out_count_data.txt', 'a+')
         f.write(count)
 
     @staticmethod
     def writeControlOutCountFile(count):
-        f = open(r'data1.txt', 'a+')
+        f = open(r'control_out_count_data.txt', 'a+')
         f.write(count)
 
     @staticmethod

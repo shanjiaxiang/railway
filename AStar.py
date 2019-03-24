@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 from Point import *
+# import Point
 import Array2D
-from obstacle import SquareObstacle
+import SquareObstacle
 
 
 class AStar:

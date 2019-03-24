@@ -1,9 +1,7 @@
 # -*- coding:utf-8 -*-
 from turtle_util import *
-from obstacle import SquareObstacle
+import SquareObstacle
 import turtle
-import draw
-import AStar as star
 
 
 class DrawObstacleUtils:

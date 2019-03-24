@@ -1,13 +1,13 @@
 # -*- coding:utf-8 -*-
 from turtle_util import *
-from obstacle import SquareObstacle
-from obstacle import DrawObstacleUtils
-from turtle import TurtleScreen, RawTurtle, TK
+import SquareObstacle
+import DrawObstacleUtils
 import turtle
 import draw
-from AStar import Array2D, AStar
+import Array2D
+import AStar
 import threading
-from config import Configurations
+import Configurations
 
 obstacles = []
 obstacles2 = []

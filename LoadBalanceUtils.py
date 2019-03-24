@@ -1,10 +1,8 @@
 # -*- coding:utf-8 -*-
-from AStar import Array2D
-from AStar import AStar
-from PathModel import *
+import Array2D
+import AStar
 from QueueModel import *
 import common_utils
-import bazier
 import math
 
 

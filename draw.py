@@ -1,17 +1,16 @@
 # -*- coding:utf-8 -*-
 # from turtle import *
-from bazier import *
 from turtle_util import *
 from point_model import *
 from common_utils import *
 # import DrawObstacleUtils as obstacle
 import threading
 import turtle
-from AStar import Array2D, AStar
-from LoadBalance import LoadBalanceUtils
-from utils import FileUtils
-from plt import DrawLineUtils
-import _thread
+import Array2D
+import AStar
+import LoadBalanceUtils
+import FileUtils
+import DrawLineUtils
 
 
 class DrawUtils:
