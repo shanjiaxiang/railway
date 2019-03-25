@@ -23,7 +23,7 @@ class FileUtils:
 
     @staticmethod
     def writeDestFile(destSize, pointSize):
-        f = open(r'..\data\dest.txt', 'w')
+        f = open(r'dest.txt', 'w')
         for i in range(pointSize):
             f.write(str(random.randint(0, destSize - 1)) + '\n')
 
@@ -33,8 +33,8 @@ class FileUtils:
         f = open(r'dest.txt', 'r')
         for line in f.readlines():
             newLine = int(line)
-            if newLine != 0:
-                listIndex.append(newLine)
+            # if newLine != 0:
+            listIndex.append(newLine)
         return listIndex
 
     @staticmethod

@@ -218,10 +218,10 @@ def main():
 
     obstacles = []
     obstacles2 = []
-    obstacles.append(SquareObstacle.SquareObstacle(Point(100, 60), Point(100 + 10, 60 + 10)))
-    obstacles.append(SquareObstacle.SquareObstacle(Point(130, 90), Point(130 + 10, 90 + 10)))
-    obstacles2.append(SquareObstacle.SquareObstacle(Point(300, 60), Point(300 + 10, 60 + 10)))
-    obstacles2.append(SquareObstacle.SquareObstacle(Point(330, 90), Point(330 + 10, 90 + 10)))
+    # obstacles.append(SquareObstacle.SquareObstacle(Point(100, 60), Point(100 + 10, 60 + 10)))
+    # obstacles.append(SquareObstacle.SquareObstacle(Point(130, 90), Point(130 + 10, 90 + 10)))
+    # obstacles2.append(SquareObstacle.SquareObstacle(Point(300, 60), Point(300 + 10, 60 + 10)))
+    # obstacles2.append(SquareObstacle.SquareObstacle(Point(330, 90), Point(330 + 10, 90 + 10)))
     obastacleUtil = DrawObstacleUtils.DrawObstacleUtils((width, height), obstacles, obstacles2)
     turtle.onscreenclick(addObstacle)
     initDrawUtil(width, height, Point(50, 50),Point(250, 50))

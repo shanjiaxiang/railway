@@ -103,12 +103,12 @@ class DrawLineUtils:
         self.turtleLineChartInit(Point(600, 70),"闸机5")
         self.turtleLineChartInit(Point(600, 20),"闸机4")
 
-        self.preList.append(DataBean(400, 120))
-        self.preList.append(DataBean(400, 70))
         self.preList.append(DataBean(400, 20))
-        self.preList.append(DataBean(600, 120))
-        self.preList.append(DataBean(600, 70))
+        self.preList.append(DataBean(400, 70))
+        self.preList.append(DataBean(400, 120))
         self.preList.append(DataBean(600, 20))
+        self.preList.append(DataBean(600, 70))
+        self.preList.append(DataBean(600, 120))
 
         self.turtle_line.penup()
         self.turtle_line.goto(600, 170)
@@ -184,9 +184,9 @@ class DrawLineUtils:
             self.turtle_line.penup()
             self.turtle_line.goto(self.preList[index].x, self.preList[index].rawY + self.preList[index].y1)
             self.turtle_line.pendown()
-            self.turtle_line.goto(self.preList[index].x + 1, self.preList[index].rawY + list1[index])
+            self.turtle_line.goto(self.preList[index].x + 1, self.preList[index].rawY + list1[index]+0.5)
             self.turtle_line.penup()
-            self.preList[index].y1 = list1[index]
+            self.preList[index].y1 = list1[index]+0.5
 
         self.turtle_line.pencolor(self.color[2])
         for i in range(len(list2)):
