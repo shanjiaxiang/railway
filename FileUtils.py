@@ -1,6 +1,7 @@
 import common_utils
 import random
-
+import os
+import sys
 
 class FileUtils:
     @staticmethod
@@ -14,7 +15,10 @@ class FileUtils:
     @staticmethod
     def readFile():
         listTime = []
-        f = open(r'data.txt', 'r')
+        filePath = r'data.txt'
+        print(FileUtils.resource_path(filePath))
+
+        f = open(FileUtils.resource_path(filePath), 'r')
         for line in f.readlines():
             newLine = int(line)
             if newLine != 0:
@@ -30,7 +34,10 @@ class FileUtils:
     @staticmethod
     def readDestFile():
         listIndex = []
-        f = open(r'dest.txt', 'r')
+        filePath = r'dest.txt'
+        print(FileUtils.resource_path(filePath))
+
+        f = open(FileUtils.resource_path(filePath), 'r')
         for line in f.readlines():
             newLine = int(line)
             # if newLine != 0:
@@ -68,6 +75,19 @@ class FileUtils:
             f.write('(' + str(y.x) + ',' + str(y.y) + ')')
             f.write(',')
         f.write('\n')
+
+    @staticmethod
+    def resource_path(relative_path):
+        """ Get absolute path to resource, works for dev and for PyInstaller """
+        # base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        # return os.path.join(base_path, relative_path)
+        try:
+            # PyInstaller creates a temp folder and stores path in _MEIPASS
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)
 # FileUtils.writeFile()
 # FileUtils.readFile()
 
