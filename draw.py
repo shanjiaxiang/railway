@@ -130,7 +130,7 @@ class DrawUtils:
                 user.prePosition = user.currPosition
                 user.currPosition = currentPoint
 
-                drawPoint(currentPoint)
+                drawPoint(user.hasNewDest, currentPoint)
                 drawPointList.append(currentPoint)
             else:
                 user.inFlag = False
@@ -372,6 +372,9 @@ class DrawUtils:
         user2.setControlPoint(Point(user.getControlPoint().x + 200, user.getControlPoint().y))
         user.destId = dest_num
         user2.destId = dest_num2
+        if dest_num != dest_num2:
+            user2.hasNewDest = True
+            user.hasNewDest = True
         self.ENTITIES_LIST.append(user)
         self.ENTITIES_LIST2.append(user2)
 

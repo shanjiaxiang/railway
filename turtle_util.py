@@ -80,10 +80,15 @@ def upGoto(point):
     turtle.goto(point.x, point.y)
 
 
-def drawPoint(point, radius=10):
+def drawPoint(hasNew,point, radius=10):
+    if hasNew:
+        turtle.pencolor('red')
+    else:
+        turtle.pencolor('black')
     upGoto(point)
     penDown()
     dot(radius)
+    turtle.pencolor('black')
 
 
 def downGoto(point):

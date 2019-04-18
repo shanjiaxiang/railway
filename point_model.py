@@ -31,6 +31,7 @@ class UserModel:
 
     waitTime = 0
     destId = 0
+    hasNewDest = False
 
     def __init__(self, start, dest, speed=0, startTime=0):
         self.startPosition = start
@@ -48,7 +49,7 @@ class UserModel:
         if startTime == 0:
             self.startTime = getCurrentTime()
         else:
-            self.startTime  = startTime
+            self.startTime = startTime
         self.currentTime = self.startTime
         self.destTime = self.startTime + self.totalTime
         # 时间t， 用在贝塞尔曲线公式中，用于计算当前时间所在点的位置
@@ -65,7 +66,6 @@ class UserModel:
 
     def getControlPoint(self):
         return self.controlPositon
-
 
     def setCurrentTime(self, curTime):
         self.currentTime = curTime
@@ -118,6 +118,7 @@ class UserModel:
                 return self.pathList[x]
         self.inFlag = False
         return self.pathList[-1]
+
 
 class DestinationModel:
     id = 0
